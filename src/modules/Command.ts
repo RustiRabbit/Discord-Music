@@ -1,4 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { CommandInteraction } from "discord.js";
 
 class Command {
     commandString: string | null;
@@ -17,6 +18,10 @@ class Command {
         this.description = description;
     }
 
+    interactionCreate(interaction: CommandInteraction) {
+        throw new Error("Interaction create handler not implemented for: " + interaction.commandName);
+    }
+
     generateSlashCommand(): SlashCommandBuilder | null {
         if(this.commandString != null && this.description != null) {
             return new SlashCommandBuilder().setName(this.commandString).setDescription(this.description);
@@ -31,6 +36,12 @@ class HelloWorld extends Command {
         this.setCommandString("hello");
         this.setDescription("The First Test Command");
     }
+
+    interactionCreate(interaction: CommandInteraction) {
+        interaction.reply("Hello World");
+    }
+
+
 }
 
 export default Command;

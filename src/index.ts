@@ -1,6 +1,6 @@
 // Import Libraries
 import CONFIG from "./config";
-import { Client, Intents } from "discord.js";
+import { Client, CommandInteraction, Intents, Interaction } from "discord.js";
 
 // Import command handler
 import CommandHandler from "./modules/CommandHandler";
@@ -24,6 +24,12 @@ client.once('ready', () => { // Run when the client logs in sucessfully
     // Register Commands
     handler.registerSlashCommands(client);
 });
+
+client.on('interactionCreate', (interaction: Interaction) => {
+    if(!interaction.isCommand()) return;
+
+    handler.handle(interaction);
+})
 
 // Login with our client token
 client.login(CONFIG.TOKEN);

@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
-import { Client } from "discord.js";
+import { Client, CommandInteraction, Interaction } from "discord.js";
 import { Routes } from "discord-api-types/v9";
 import CONFIG from "../config";
 
@@ -11,6 +11,14 @@ class CommandHandler {
 
     registerCommands(command: Command) {
         this.commands.push(command);
+    }
+
+    async handle(interaction: CommandInteraction) {
+        this.commands.forEach(command => {
+            if(command.commandString == interaction.commandName) {
+                command.interactionCreate(interaction);
+            }
+        })
     }
 
     async registerSlashCommands(client: Client) {
@@ -37,9 +45,6 @@ class CommandHandler {
                 
             }
         })
-
-        
-    
     }
 }
 
