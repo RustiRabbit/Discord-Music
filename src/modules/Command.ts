@@ -39,7 +39,7 @@ class Command {
     }
 }
 
-class HelloWorld extends Command {
+/*class HelloWorld extends Command {
     constructor() {
         super();
         this.setCommandString("hello");
@@ -56,7 +56,6 @@ class HelloWorld extends Command {
     interactionCreate(interaction: CommandInteraction) {
         interaction.reply("Hello " + interaction.options.getString("name"));
     }
-}
+}*/
 
 export default Command;
-export { HelloWorld };
