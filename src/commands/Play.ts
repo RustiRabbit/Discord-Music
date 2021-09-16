@@ -1,7 +1,10 @@
 import {  SlashCommandStringOption } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
+import { url } from "inspector";
+
 import { applicationState } from "..";
 import Command from "../modules/commands/Command";
+import Messages from "../modules/Messages";
 
 /*
 Play command
@@ -21,7 +24,7 @@ class Play extends Command {
 
         let urlOption:SlashCommandStringOption = new SlashCommandStringOption();
         urlOption.setName("url");
-        urlOption.setDescription("Enter a youtube URL");
+        urlOption.setDescription("Enter a song/video title or URL");
         urlOption.required = true;
         this.addStringOption(urlOption);
     }
@@ -29,16 +32,17 @@ class Play extends Command {
     // Command logic
     async interactionCreate(interaction: CommandInteraction) {
         if(interaction.options.getString("url") != null) {
-            // TODO - Validate URL
+
+            let urlString = interaction.options.getString("url") as string;
+
             let server = await applicationState.getServer(interaction.guildId as string);
             let state = server.state;
 
-            interaction.reply(":mag_right: Searching for `" + interaction.options.getString("url") + "`");
+            interaction.reply(Messages.Search(urlString));
 
-            state.addVideo(interaction.options.getString("url") as string, interaction);
+            state.addVideo(urlString, interaction);
 
         }
-        
     }
 }
 

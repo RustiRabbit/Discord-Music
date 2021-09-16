@@ -30,9 +30,13 @@ class Video {
         this.search_ = {term: term, type: type};      
     }
 
-    // Get video info
-    // Not search, only gets from URL
-    searchVideo() {
+    // Verify whether input is a youtube URL
+    verifyURL(url: string) {
+        let verify:RegExp = new RegExp("^https://www.youtube.com|^www.youtube.com|^youtube.com");
+        return verify.test(url);
+    }
+
+    getVideoFromURL(url: string) {
         return new Promise<VideoInfomation>((resolve, reject) => {
             youtubedl.default(this.search_.term, {
                 dumpSingleJson: true,
@@ -45,6 +49,36 @@ class Video {
                 resolve(this.infomation_);
             });
         })
+    }
+
+    // Get video info
+    searchVideo() {
+
+        // If not url mark as search
+        if (this.verifyURL(this.search_.term) == false) {
+            this.search_.type = INPUT_TYPE.SEARCH;
+        }
+
+        //If type URL
+        if (this.search_.type == INPUT_TYPE.URL) {
+            console.log("search type: url");
+            //Just use URL
+            return this.getVideoFromURL(this.search_.term);
+
+        } else {
+
+            console.log("search type: search");
+            //Search for first result, then use that URL
+            youtubedl.default(this.search_.term, {
+                dumpSingleJson: true,
+                defaultSearch: "ytsearch:"
+            }).then(output => {
+                this.search_.term = output.url;
+                console.log(output.url);
+                return this.getVideoFromURL(this.search_.term);
+            });
+        }
+        
     }
 
     // Get video info

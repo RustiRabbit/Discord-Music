@@ -15,7 +15,6 @@
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
-    "valid-url": "^1.0.9",
     "youtube-dl-exec": "^1.2.6"
   },
   "devDependencies": {
