@@ -17,7 +17,11 @@ class State {
     async addVideo(input: string, interaction: CommandInteraction) {
         let video = new Video(input, INPUT_TYPE.URL);
         let info = await video.searchVideo();
-        //interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
+        if (info != null) {
+            interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
+        } else {
+            interaction.editReply("No results found");
+        }
     
         // Add to the queue
         this.queue_.push(video);

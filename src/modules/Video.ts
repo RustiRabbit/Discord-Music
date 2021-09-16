@@ -36,9 +36,10 @@ class Video {
         return verify.test(url);
     }
 
+    // Get video information from youtube URL
     getVideoFromURL(url: string) {
         return new Promise<VideoInfomation>((resolve, reject) => {
-            youtubedl.default(this.search_.term, {
+            youtubedl.default(url, {
                 dumpSingleJson: true,
             }).then(output => {
                 this.infomation_ = {
@@ -48,11 +49,29 @@ class Video {
                 }
                 resolve(this.infomation_);
             });
-        })
+        });
+    }
+
+    // Get URl of top youtube result for a search term
+    getURLFromSearch(term: string) {
+        return new Promise<string | null>((resolve, reject) => {
+            youtubedl.default(this.search_.term, {
+                dumpSingleJson: true,
+                defaultSearch: "ytsearch:"
+            }).then(output => {
+                var outURL:string | null;
+                if ((output as any).entries[0] != undefined) {
+                    outURL = (output as any).entries[0].webpage_url;
+                } else {
+                    outURL = null;
+                }
+                resolve(outURL);
+            });
+        });
     }
 
     // Get video info
-    searchVideo() {
+    async searchVideo() {
 
         // If not url mark as search
         if (this.verifyURL(this.search_.term) == false) {
@@ -61,22 +80,16 @@ class Video {
 
         //If type URL
         if (this.search_.type == INPUT_TYPE.URL) {
-            console.log("search type: url");
             //Just use URL
             return this.getVideoFromURL(this.search_.term);
-
         } else {
-
-            console.log("search type: search");
-            //Search for first result, then use that URL
-            youtubedl.default(this.search_.term, {
-                dumpSingleJson: true,
-                defaultSearch: "ytsearch:"
-            }).then(output => {
-                this.search_.term = (output as any).entries[0].webpage_url;
-                console.log((output as any).entries[0].webpage_url);
-                return this.getVideoFromURL(this.search_.term);
-            });
+            //Search for URL first, then return
+            let actualURL:string | null = await this.getURLFromSearch(this.search_.term);
+            if (actualURL != null) {
+                return this.getVideoFromURL(actualURL as string);
+            } else {
+                return this.infomation_;
+            }
         }
         
     }
