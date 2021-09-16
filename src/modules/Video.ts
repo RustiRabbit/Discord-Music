@@ -73,7 +73,6 @@ class Video {
 
     // Get video info
     async searchVideo() {
-
         // If not url mark as search
         if (this.verifyURL(this.search_.term) == false) {
             this.search_.type = INPUT_TYPE.SEARCH;
@@ -93,7 +92,6 @@ class Video {
                 return this.infomation_;
             }
         }
-        
     }
 
     // Get video info
