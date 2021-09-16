@@ -41,6 +41,10 @@ class Video {
         })
     }
 
+    async download() {
+        
+    }
+
     get infomation() {
         return this.infomation_;
     }

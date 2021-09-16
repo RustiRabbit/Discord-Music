@@ -3,7 +3,7 @@ import { CommandInteraction } from "discord.js";
 import { applicationState } from "..";
 import Command from "../modules/commands/Command";
 import Messages from "../modules/Messages";
-import VoicePermissions from "../modules/VoicePermissions";
+import VoicePermissions from "../modules/Voice/VoicePermissions";
 
 class Play extends Command {
     constructor() {
