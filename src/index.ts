@@ -12,7 +12,10 @@ import Play from "./commands/Play";
 import Queue from "./commands/Queue";
 
 // Create Discord Client
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_VOICE_STATES,
+] });
 
 console.log(generateDependencyReport() + "\n");
 

@@ -3,6 +3,7 @@ import { CommandInteraction } from "discord.js";
 import { applicationState } from "..";
 import Command from "../modules/commands/Command";
 import Messages from "../modules/Messages";
+import VoicePermissions from "../modules/VoicePermissions";
 
 class Play extends Command {
     constructor() {
@@ -20,6 +21,12 @@ class Play extends Command {
     async interactionCreate(interaction: CommandInteraction) {
         let server = await applicationState.getServer(interaction.guildId as string);
         let state = server.state;
+
+        // Check if the user is in a voice chat
+        if (VoicePermissions.UserInVoiceChat(interaction) == false) {
+            interaction.reply(Messages.NotInVC());
+            return;
+        } 
     
         interaction.reply(Messages.Search(interaction.options.getString("url") as string));
     
