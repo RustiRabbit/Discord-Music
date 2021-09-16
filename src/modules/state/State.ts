@@ -23,6 +23,7 @@ class State {
             responseEmbed.setTitle("Song Added to Queue");
             responseEmbed.setThumbnail(info.thumbnail);
             responseEmbed.addField(info.name,info.length,true);
+            responseEmbed.setURL(info.url);
             interaction.editReply({embeds: [responseEmbed]});
         } else {
             if (video.search.type == INPUT_TYPE.SEARCH) {

@@ -1,5 +1,3 @@
-import { fromUnixTime } from "date-fns";
-import format from "date-fns/format";
 import * as youtubedl from "youtube-dl-exec";
 
 // Enum for user command input (i.e. search or URL)
@@ -44,10 +42,23 @@ class Video {
                 await youtubedl.default(url, {
                     dumpSingleJson: true,
                 }).then(output => {
+                    //Generate time in hours, minutes and seconds
+                    let times:number[] = [(output.duration - (output.duration % 3600)) / 3600, (((output.duration % 3600) - (output.duration % 3600) % 60) / 60), (output.duration % 3600) % 60];
+                    //Convert to strings and add extra 0 where necesary to comply with hh:mm:ss
+                    let timesString:string[] = [];
+                    for (let i = 0; i < 3; i++) {
+                        if (times[i] < 10) {
+                            timesString.push(String(times[i]));
+                            timesString[i] = "0" + timesString[i];
+                        } else {
+                            timesString.push(String(times[i]));
+                        }
+                    }
+                    
                     this.infomation_ = {
                         name: output.title,
                         url: output.webpage_url,
-                        length: format(fromUnixTime(output.duration), "hh:mm:ss"),
+                        length: timesString[0] + ":" + timesString[1] + ":" + timesString[2],
                         thumbnail: output.thumbnail,
                     }
                     resolve(this.infomation_);
