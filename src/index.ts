@@ -10,6 +10,7 @@ import CommandHandler from "./modules/commands/CommandHandler";
 import StateManager from "./modules/state/StateManager";
 import Play from "./commands/Play";
 import Queue from "./commands/Queue";
+import Leave from "./commands/Leave";
 
 // Create Discord Client
 const client = new Client({ intents: [
@@ -25,6 +26,7 @@ const handler:CommandHandler = new CommandHandler();
 // Register commands
 handler.registerCommands(new Play());
 handler.registerCommands(new Queue());
+handler.registerCommands(new Leave());
 
 
 // Create State Handler
