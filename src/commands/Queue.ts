@@ -2,6 +2,9 @@ import { CommandInteraction, MessageEmbed } from "discord.js";
 import { applicationState } from "..";
 import Command from "../modules/commands/Command";
 
+/*
+Checks current queue and returns
+*/
 class Queue extends Command {
     constructor() {
         super();

@@ -1,5 +1,9 @@
 import State from "./State";
 
+/*
+Server class
+For holding information about servers bot is in
+*/
 class DiscordServer {
     private id_: string;
     private name_: string;

@@ -6,13 +6,20 @@ import CONFIG from "../../config";
 
 import Command from "./Command";
 
+/*
+Command handler class
+Takes commands and processes globally, returns at input location
+Also responsible for registering commands on start-up
+*/
 class CommandHandler {
     commands: Array<Command> = [];
 
+    // Register commands with handler
     registerCommands(command: Command) {
         this.commands.push(command);
     }
 
+    // Handle incoming commands
     async handle(interaction: CommandInteraction) {
         this.commands.forEach(command => {
             if(command.commandString == interaction.commandName) {
@@ -20,7 +27,8 @@ class CommandHandler {
             }
         })
     }
-
+    
+    // Generate JSON data for commands and register with API
     async registerSlashCommands(client: Client) {
         // Generate JSON data for the slash commands
         const data =  this.commands.map(command => {

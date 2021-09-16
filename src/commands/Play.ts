@@ -3,7 +3,17 @@ import { CommandInteraction } from "discord.js";
 import { applicationState } from "..";
 import Command from "../modules/commands/Command";
 
+/*
+Play command
+Plays adds a song to the end of the queue,
+joins vc if not already joined, plays music automatically
+
+Can search by name or URL
+(Only URL implemented currently)
+*/
 class Play extends Command {
+
+    // Constructor (Sets up command logic to run)
     constructor() {
         super();
         this.setCommandString("play");
@@ -16,6 +26,7 @@ class Play extends Command {
         this.addStringOption(urlOption);
     }
 
+    // Command logic
     async interactionCreate(interaction: CommandInteraction) {
         if(interaction.options.getString("url") != null) {
             // TODO - Validate URL

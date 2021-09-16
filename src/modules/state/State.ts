@@ -1,7 +1,12 @@
 import { CommandInteraction } from "discord.js";
-import Messages from "../Messaages";
+import Messages from "../Messages";
 import Video, { INPUT_TYPE } from "../Video";
 
+/*
+State class
+Contains state of bot per server
+All information about current state e.g. queue
+*/
 class State {
     private queue_:Array<Video>;
 

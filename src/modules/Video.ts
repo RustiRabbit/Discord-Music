@@ -2,23 +2,27 @@ import { fromUnixTime } from "date-fns";
 import format from "date-fns/format";
 import * as youtubedl from "youtube-dl-exec";
 
+// Enum for user command input (i.e. search or URL)
 enum INPUT_TYPE {
     URL = 0,
     SEARCH = 1,
 }
 
+// Video info type
 type VideoInfomation = {
     name: string,
     url: string,
     length: string,
 }
 
+// Search information type
 type SearchParams = {
     term: string,
     type: INPUT_TYPE
 }
 
 class Video {
+    // When referencing video information, always wrap in a !null if
     private infomation_: VideoInfomation | null = null;
     private search_: SearchParams;
     
@@ -26,6 +30,8 @@ class Video {
         this.search_ = {term: term, type: type};      
     }
 
+    // Get video info
+    // Not search, only gets from URL
     searchVideo() {
         return new Promise<VideoInfomation>((resolve, reject) => {
             youtubedl.default(this.search_.term, {
@@ -41,6 +47,7 @@ class Video {
         })
     }
 
+    // Get video info
     get infomation() {
         return this.infomation_;
     }

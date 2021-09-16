@@ -1,3 +1,5 @@
+//TEST COMMAND, DEPRECIATED
+
 /*
 
 This file servers as an example

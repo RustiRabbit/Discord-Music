@@ -2,6 +2,11 @@ import { Client } from "discord.js";
 import DiscordServer from "./DiscordServer";
 import State from "./State";
 
+/*
+State manager
+Overarching control centre for states across servers
+Methods for iterating servers etc.
+*/
 class StateManager {
     private servers:Array<DiscordServer>;
     
@@ -9,7 +14,7 @@ class StateManager {
         this.servers = [];
     }
 
-    // Scan server list and add to the array
+    // Iterate servers and add each to array
     addServers(client: Client) {
         return new Promise<void>((resolve, reject) => {
             // Clear server List
@@ -26,7 +31,7 @@ class StateManager {
         
     }
 
-    // Add one specific server
+    // Add server to array
     private addServer(server: DiscordServer) {
         this.servers.push(server);
     }
