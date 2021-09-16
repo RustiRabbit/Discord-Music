@@ -1,6 +1,7 @@
 // Import Libraries
 import CONFIG from "./config";
 import { Client, CommandInteraction, Intents, Interaction } from "discord.js";
+import { generateDependencyReport } from "@discordjs/voice";
 
 // Import command handler
 import CommandHandler from "./modules/commands/CommandHandler";
@@ -13,7 +14,9 @@ import Queue from "./commands/Queue";
 
 // Create Discord Client
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
- 
+
+console.log(generateDependencyReport() + "\n");
+
 // Create Command Handler
 const handler:CommandHandler = new CommandHandler();
 
