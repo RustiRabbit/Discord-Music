@@ -8,7 +8,6 @@ import CommandHandler from "./modules/commands/CommandHandler";
 
 // Import commands
 import StateManager from "./modules/state/StateManager";
-import DiscordServer from "./modules/state/DiscordServer";
 import Play from "./commands/Play";
 import Queue from "./commands/Queue";
 
