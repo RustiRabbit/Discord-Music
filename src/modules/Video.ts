@@ -73,8 +73,8 @@ class Video {
                 dumpSingleJson: true,
                 defaultSearch: "ytsearch:"
             }).then(output => {
-                this.search_.term = output.url;
-                console.log(output.url);
+                this.search_.term = (output as any).entries[0].webpage_url;
+                console.log((output as any).entries[0].webpage_url);
                 return this.getVideoFromURL(this.search_.term);
             });
         }
