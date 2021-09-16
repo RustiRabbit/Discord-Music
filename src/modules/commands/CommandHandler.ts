@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 import { Client, CommandInteraction, Interaction } from "discord.js";
 import { Routes } from "discord-api-types/v9";
-import CONFIG from "../config";
+import CONFIG from "../../config";
 
 import Command from "./Command";
 

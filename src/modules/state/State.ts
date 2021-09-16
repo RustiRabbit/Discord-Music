@@ -1,19 +1,27 @@
+import { CommandInteraction } from "discord.js";
+import Messages from "../Messaages";
+import Video, { INPUT_TYPE } from "../Video";
+
 class State {
-    private name_:string | null;
-    
+    private queue_:Array<Video>;
+
     constructor() {
-        this.name_ = "Elon Musk";
+        this.queue_ = [];
     }
 
-    // Getters
-    get name() {
-        return this.name_;
+    async addVideo(input: string, interaction: CommandInteraction) {
+        let video = new Video(input, INPUT_TYPE.URL);
+        let info = await video.searchVideo();
+        interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
+    
+        // Add to the queue
+        this.queue_.push(video);
     }
 
-    // Setters
-    setName(newName: string) {
-        this.name_ = newName;
+    get queue() {
+        return this.queue_;
     }
+
 }
 
 export default State;

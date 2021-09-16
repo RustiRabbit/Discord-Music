@@ -1,3 +1,7 @@
+/*
+
+This file servers as an example
+
 import { SlashCommandStringOption } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
 import { applicationState } from "..";
@@ -42,4 +46,4 @@ class SetName extends Command {
     }
 }
 
-export { GetName, SetName };
+export { GetName, SetName };*/

@@ -3,12 +3,13 @@ import CONFIG from "./config";
 import { Client, CommandInteraction, Intents, Interaction } from "discord.js";
 
 // Import command handler
-import CommandHandler from "./modules/CommandHandler";
+import CommandHandler from "./modules/commands/CommandHandler";
 
 // Import commands
 import StateManager from "./modules/state/StateManager";
 import DiscordServer from "./modules/state/DiscordServer";
-import { GetName, SetName } from "./commands/GetName";
+import Play from "./commands/Play";
+import Queue from "./commands/Queue";
 
 // Create Discord Client
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
@@ -17,8 +18,9 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 const handler:CommandHandler = new CommandHandler();
 
 // Register commands
-handler.registerCommands(new GetName());
-handler.registerCommands(new SetName());
+handler.registerCommands(new Play());
+handler.registerCommands(new Queue());
+
 
 // Create State Handler
 const applicationState = new StateManager();
