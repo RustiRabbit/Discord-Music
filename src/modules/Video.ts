@@ -32,23 +32,27 @@ class Video {
 
     // Verify whether input is a youtube URL
     verifyURL(url: string) {
-        let verify:RegExp = new RegExp("^https://www.youtube.com|^www.youtube.com|^youtube.com");
+        let verify:RegExp = new RegExp("^https://www.youtube.com/|^www.youtube.com/|^youtube.com/");
         return verify.test(url);
     }
 
     // Get video information from youtube URL
     getVideoFromURL(url: string) {
-        return new Promise<VideoInfomation>((resolve, reject) => {
-            youtubedl.default(url, {
-                dumpSingleJson: true,
-            }).then(output => {
-                this.infomation_ = {
-                    name: output.title,
-                    url: output.webpage_url,
-                    length: format(fromUnixTime(output.duration), "m:ss"),
-                }
-                resolve(this.infomation_);
-            });
+        return new Promise<VideoInfomation | null>(async (resolve, reject) => {
+            try {
+                await youtubedl.default(url, {
+                    dumpSingleJson: true,
+                }).then(output => {
+                    this.infomation_ = {
+                        name: output.title,
+                        url: output.webpage_url,
+                        length: format(fromUnixTime(output.duration), "m:ss"),
+                    }
+                    resolve(this.infomation_);
+                });
+            } catch (e) {
+                resolve(null);
+            }
         });
     }
 
@@ -56,7 +60,7 @@ class Video {
     // Returns either the string of the first result or if no results returns null
     getURLFromSearch(term: string) {
         return new Promise<string | null>((resolve, reject) => {
-            youtubedl.default(this.search_.term, {
+            youtubedl.default(term, {
                 dumpSingleJson: true,
                 defaultSearch: "ytsearch:"
             }).then(output => {
@@ -97,6 +101,11 @@ class Video {
     // Get video info
     get infomation() {
         return this.infomation_;
+    }
+
+    // Get search param info
+    get search() {
+        return this.search_;
     }
 }
 

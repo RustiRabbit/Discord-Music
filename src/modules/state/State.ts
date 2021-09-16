@@ -21,7 +21,11 @@ class State {
         if (info != null) {
             interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
         } else {
-            interaction.editReply("No results found");
+            if (video.search.type == INPUT_TYPE.SEARCH) {
+                interaction.editReply("No results found");
+            } else {
+                interaction.editReply("Invalid URL")
+            }
         }
     
         // Add to the queue
