@@ -23,7 +23,7 @@ class Play extends Command {
         let state = server.state;
 
         // Check if the user is in a voice chat
-        if (VoicePermissions.UserInVoiceChat(interaction) == false) {
+        if (VoicePermissions.UserInVoiceChat(interaction) == null) {
             interaction.reply(Messages.NotInVC());
             return;
         } 

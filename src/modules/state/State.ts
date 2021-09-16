@@ -1,4 +1,4 @@
-import { VoiceConnectionStatus, joinVoiceChannel, VoiceConnection, entersState } from "@discordjs/voice";
+import { VoiceConnectionStatus, joinVoiceChannel, VoiceConnection, entersState, getVoiceConnection } from "@discordjs/voice";
 import { CommandInteraction, StageChannel, TextBasedChannels, TextChannel, VoiceChannel } from "discord.js";
 import Messages from "../Messages";
 import Video, { INPUT_TYPE } from "../Video";
@@ -6,7 +6,7 @@ import VoiceHelper from "../Voice/VoiceHelper";
 
 class State {
     private queue_:Array<Video>; // Video Queue
-    private connection_:VoiceConnection | null = null; // Voice Connection
+    private voiceChannel_: VoiceChannel | StageChannel | null = null; // Voice Connection
     private messageChannel_: TextBasedChannels | null = null; // Text channel to send messages
 
     constructor() {
@@ -35,8 +35,12 @@ class State {
         return this.queue_;
     }
 
+    get connection() {
+        return this.voiceChannel_;
+    }
+
     private executeQueue(interaction?: CommandInteraction) {
-        if(this.connection_ == null) { // If the Connection is null, then start playing
+        if(this.voiceChannel_ == null) { // If the Connection is null, then connect
             if(interaction == undefined) {
                 if(this.messageChannel_ != null) {
                     this.messageChannel_.send(Messages.Error.FailedToJoin());
@@ -53,45 +57,64 @@ class State {
     
                 this.connect(channel);
             }
-            
         }
     }
 
     // Voice Connections
-    connect(channel: VoiceChannel | StageChannel) {
-        if(this.connection_ == null) { // Hasn't been created yet
-            this.connection_ = joinVoiceChannel({
+    async connect(channel: VoiceChannel | StageChannel) {
+        console.log("[Voice Channels] Attempting to connect");
+        if(this.voiceChannel_ == null) { // Hasn't been created yet
+            this.voiceChannel_ = channel;
+            let connection = await joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guildId,
                 adapterCreator: channel.guild.voiceAdapterCreator
             });
 
             // Create event handling
-            this.connection_.on(VoiceConnectionStatus.Ready, () => {
+            connection.on(VoiceConnectionStatus.Ready, () => {
                 console.log("[Connection State] Ready");
             })
 
             // Code from https://discordjs.guide/voice/voice-connections.html#life-cycle
             // This works by entering into a promise race. The race continues until either one works or fails
             // This helps differentiate between a recoverable disconnect (such as moving the bot) or a unrecoverable disconnect (such as the bot getting disconnected)
-            this.connection_.on(VoiceConnectionStatus.Disconnected, async () => {
-                if(this.connection_ != null) { // Check that the object still exists
+            connection.on(VoiceConnectionStatus.Disconnected, async () => {
+                if(connection != null) { // Check that the object still exists
                     try {
                         await Promise.race([
-                            entersState(this.connection_, VoiceConnectionStatus.Signalling, 5_000),
-                            entersState(this.connection_, VoiceConnectionStatus.Connecting, 5_000),
+                            entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
+                            entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
                         ]);
                         console.log("[Connection State] Reconnected");
                         // Seems to be reconnecting to a new channel - ignore disconnect
                     } catch (error) {
                         // Seems to be a real disconnect which SHOULDN'T be recovered from
-                        this.connection_.destroy();
+                        connection.destroy();
+                        this.voiceChannel_ = null;
                         console.log("[Connection State] Disconnected");
-                        this.connection_ = null;
                     }    
                 }     
             })
         }
+    }
+
+    // Disconnect from the voice call
+    async disconnect() {
+        return new Promise<void>((resolve, reject) => {
+            if(this.voiceChannel_ != null) {
+                // Get the connection
+                try {
+                    let connection = getVoiceConnection(this.voiceChannel_.guildId); // Get the connection
+                    connection?.disconnect(); // Send Disconnect Messagge
+                    resolve();
+                } catch (error) {
+                    reject();
+                }
+                
+            }
+        })
+        
     }
 
 
