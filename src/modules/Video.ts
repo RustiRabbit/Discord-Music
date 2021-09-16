@@ -53,6 +53,7 @@ class Video {
     }
 
     // Get URl of top youtube result for a search term
+    // Returns either the string of the first result or if no results returns null
     getURLFromSearch(term: string) {
         return new Promise<string | null>((resolve, reject) => {
             youtubedl.default(this.search_.term, {
@@ -85,6 +86,7 @@ class Video {
         } else {
             //Search for URL first, then return
             let actualURL:string | null = await this.getURLFromSearch(this.search_.term);
+            //If returns null (no results found) pass on null information value for handling
             if (actualURL != null) {
                 return this.getVideoFromURL(actualURL as string);
             } else {

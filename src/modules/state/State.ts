@@ -17,6 +17,7 @@ class State {
     async addVideo(input: string, interaction: CommandInteraction) {
         let video = new Video(input, INPUT_TYPE.URL);
         let info = await video.searchVideo();
+        //If a video result is found then normal message, otherwise handle with error message
         if (info != null) {
             interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
         } else {
