@@ -13,6 +13,7 @@ type VideoInfomation = {
     name: string,
     url: string,
     length: string,
+    thumbnail: string,
 }
 
 // Search information type
@@ -46,7 +47,8 @@ class Video {
                     this.infomation_ = {
                         name: output.title,
                         url: output.webpage_url,
-                        length: format(fromUnixTime(output.duration), "m:ss"),
+                        length: format(fromUnixTime(output.duration), "hh:mm:ss"),
+                        thumbnail: output.thumbnail,
                     }
                     resolve(this.infomation_);
                 });

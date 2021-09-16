@@ -10,6 +10,7 @@ const Messages = {
     },
 
     // Response after successful search
+    // DEPRECIATED
     Found: (name: string) => {
         return "Found video `" + name + "`";
     } 

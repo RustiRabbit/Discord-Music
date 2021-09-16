@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, MessageEmbed, MessagePayload } from "discord.js";
 import Messages from "../Messages";
 import Video, { INPUT_TYPE } from "../Video";
 
@@ -19,7 +19,11 @@ class State {
         let info = await video.searchVideo();
         //If a video result is found then normal message, otherwise handle with error message
         if (info != null) {
-            interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
+            let responseEmbed:MessageEmbed = new MessageEmbed();
+            responseEmbed.setTitle("Song Added to Queue");
+            responseEmbed.setThumbnail(info.thumbnail);
+            responseEmbed.addField(info.name,info.length,true);
+            interaction.editReply({embeds: [responseEmbed]});
         } else {
             if (video.search.type == INPUT_TYPE.SEARCH) {
                 interaction.editReply("No results found");
