@@ -1,26 +1,34 @@
 // Import Libraries
 import CONFIG from "./config";
 import { Client, CommandInteraction, Intents, Interaction } from "discord.js";
+import { generateDependencyReport } from "@discordjs/voice";
 
 // Import command handler
 import CommandHandler from "./modules/commands/CommandHandler";
 
 // Import commands
 import StateManager from "./modules/state/StateManager";
-import DiscordServer from "./modules/state/DiscordServer";
 import Play from "./commands/Play";
-import Queue from "./commands/Queue";
+import Add from "./commands/QueueManipulation/Add";
+import Queue from "./commands/QueueManipulation/Queue";
+import Skip from "./commands/QueueManipulation/Skip";
 
 // Create Discord Client
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
- 
+const client = new Client({ intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_VOICE_STATES,
+] });
+
+console.log(generateDependencyReport() + "\n");
+
 // Create Command Handler
 const handler:CommandHandler = new CommandHandler();
 
 // Register commands
 handler.registerCommands(new Play());
 handler.registerCommands(new Queue());
-
+handler.registerCommands(new Add());
+handler.registerCommands(new Skip());
 
 // Create State Handler
 const applicationState = new StateManager();
