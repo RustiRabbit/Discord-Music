@@ -1,16 +1,14 @@
-import { VoiceConnectionStatus, joinVoiceChannel, VoiceConnection, entersState, getVoiceConnection } from "@discordjs/voice";
-import { CommandInteraction, StageChannel, TextBasedChannels, TextChannel, VoiceChannel } from "discord.js";
-import Messages from "../Messages";
+import { CommandInteraction } from "discord.js";
+import Messages from "../Messaages";
+import PlayingQueue from "../Queue";
 import Video, { INPUT_TYPE } from "../Video";
 import VoiceHelper from "../Voice/VoiceHelper";
 
 class State {
-    private queue_:Array<Video>; // Video Queue
-    private voiceChannel_: VoiceChannel | StageChannel | null = null; // Voice Connection
-    private messageChannel_: TextBasedChannels | null = null; // Text channel to send messages
+    private queue_:PlayingQueue;
 
     constructor() {
-        this.queue_ = [];
+        this.queue_ = new PlayingQueue();
     }
 
     // Queue
@@ -21,13 +19,7 @@ class State {
         interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
     
         // Add to the queue
-        this.queue_.push(video);
-    
-        // Setup Message Channel
-        this.messageChannel_ = interaction.channel;
-
-        // Run the queue
-        this.executeQueue(interaction);
+        this.queue_.addVideo(video);
     }
 
 

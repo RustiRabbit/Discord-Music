@@ -9,8 +9,8 @@ import CommandHandler from "./modules/commands/CommandHandler";
 // Import commands
 import StateManager from "./modules/state/StateManager";
 import Play from "./commands/Play";
-import Queue from "./commands/Queue";
-import Leave from "./commands/Leave";
+import Add from "./commands/QueueManipulation/Add";
+import Queue from "./commands/QueueManipulation/Queue";
 import TestPlay from "./commands/TestPlay";
 
 // Create Discord Client
@@ -27,7 +27,8 @@ const handler:CommandHandler = new CommandHandler();
 // Register commands
 handler.registerCommands(new Play());
 handler.registerCommands(new Queue());
-handler.registerCommands(new Leave());
+handler.registerCommands(new Add());
+handler.registerCommands(new Queue());
 handler.registerCommands(new TestPlay());
 
 // Create State Handler

@@ -5,32 +5,17 @@ import Command from "../modules/commands/Command";
 import Messages from "../modules/Messages";
 import VoicePermissions from "../modules/Voice/VoicePermissions";
 
+// This command joins the vc
 class Play extends Command {
     constructor() {
         super();
         this.setCommandString("play");
-        this.setDescription("Play a song");
+        this.setDescription("Start the player");
 
-        let urlOption:SlashCommandStringOption = new SlashCommandStringOption();
-        urlOption.setName("url");
-        urlOption.setDescription("Enter a youtube URL");
-        urlOption.required = true;
-        this.addStringOption(urlOption);
+
     }
 
     async interactionCreate(interaction: CommandInteraction) {
-        let server = await applicationState.getServer(interaction.guildId as string);
-        let state = server.state;
-
-        // Check if the user is in a voice chat
-        if (VoicePermissions.UserInVoiceChat(interaction) == null) {
-            interaction.reply(Messages.NotInVC());
-            return;
-        } 
-    
-        interaction.reply(Messages.Search(interaction.options.getString("url") as string));
-    
-        state.addVideo(interaction.options.getString("url") as string, interaction);
     }
 }
 
