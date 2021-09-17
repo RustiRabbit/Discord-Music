@@ -28,7 +28,6 @@ const handler:CommandHandler = new CommandHandler();
 handler.registerCommands(new Play());
 handler.registerCommands(new Queue());
 handler.registerCommands(new Add());
-handler.registerCommands(new Queue());
 handler.registerCommands(new TestPlay());
 
 // Create State Handler

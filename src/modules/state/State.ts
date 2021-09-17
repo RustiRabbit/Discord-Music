@@ -1,19 +1,51 @@
-import { CommandInteraction } from "discord.js";
-import Messages from "../Messaages";
-import PlayingQueue from "../Queue";
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
+import { CommandInteraction, StageChannel, TextBasedChannel, TextBasedChannels, VoiceChannel } from "discord.js";
+import Messages from "../Messages";
+import PlayingQueue, { QUEUE_STATE } from "../PlayingQueue";
 import Video, { INPUT_TYPE } from "../Video";
 import VoiceHelper from "../Voice/VoiceHelper";
+import ytdl from 'ytdl-core';
+import { bold } from "@discordjs/builders";
 
 class State {
     private queue_:PlayingQueue;
+    private player_:AudioPlayer;
+    private message_:TextBasedChannels | null = null;
 
     constructor() {
         this.queue_ = new PlayingQueue();
+        this.player_ = new AudioPlayer();
+
+        this.player_.on(AudioPlayerStatus.Idle, () => {
+            console.log("[Player] Idle");
+            this.queue_.finished();
+            this.start();
+        })
+
+        this.player_.on(AudioPlayerStatus.Playing, () => {
+            console.log("[Player] Playing");
+        })
+
+        this.player_.on('error', () => {
+            console.log("Found error lol");
+        })
+    }
+
+    sendMessage(text: string) {
+        if(this.message_ != null) {
+            this.message_.send(text);
+        } else {
+            console.log("[Message - Unable to send] " + text);
+        }
+    }
+
+    setMessageChannel(channel: TextBasedChannels) {
+        this.message_ = channel;
     }
 
     // Queue
-
     async addVideo(input: string, interaction: CommandInteraction) {
+        interaction.editReply(Messages.Search(input));
         let video = new Video(input, INPUT_TYPE.URL);
         let info = await video.searchVideo();
         interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
@@ -27,90 +59,86 @@ class State {
         return this.queue_;
     }
 
-    get connection() {
-        return this.voiceChannel_;
-    }
-
-    private executeQueue(interaction?: CommandInteraction) {
-        if(this.voiceChannel_ == null) { // If the Connection is null, then connect
-            if(interaction == undefined) {
-                if(this.messageChannel_ != null) {
-                    this.messageChannel_.send(Messages.Error.FailedToJoin());
-                    return;
-                } else {
-                    console.log("[Error] Failed to join the voice chat")
-                }
-            } else {
-                let channel = VoiceHelper.GetVoiceChat(interaction); // Get the voice channel to join
-                if(channel == null) { // Error Handling
-                    interaction.channel?.send(Messages.Error.FailedToJoin());
-                    return;
-                }
-    
-                this.connect(channel);
-            }
-        }
-    }
-
-    // Voice Connections
-    async connect(channel: VoiceChannel | StageChannel) {
-        console.log("[Voice Channels] Attempting to connect");
-        if(this.voiceChannel_ == null) { // Hasn't been created yet
-            this.voiceChannel_ = channel;
-            let connection = await joinVoiceChannel({
+    // VOICE
+    async connectAudio(channel: VoiceChannel | StageChannel) {
+        let connection: VoiceConnection | undefined = getVoiceConnection(channel.guildId);
+        
+        if(connection == undefined) {
+            console.log("[VC] Need to join vc")
+            connection = joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guildId,
                 adapterCreator: channel.guild.voiceAdapterCreator
             });
+            
+            // Setup subscriptions
+            connection.subscribe(this.player_);
 
-            // Create event handling
+            // Shown when ready to play
             connection.on(VoiceConnectionStatus.Ready, () => {
-                console.log("[Connection State] Ready");
-            })
+                console.log("[VC Status] Ready");
+            })    
 
-            // Code from https://discordjs.guide/voice/voice-connections.html#life-cycle
-            // This works by entering into a promise race. The race continues until either one works or fails
-            // This helps differentiate between a recoverable disconnect (such as moving the bot) or a unrecoverable disconnect (such as the bot getting disconnected)
-            connection.on(VoiceConnectionStatus.Disconnected, async () => {
-                if(connection != null) { // Check that the object still exists
+            // Yoinked from the discordjs voice guide
+            connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
+                if(connection != undefined)  {
                     try {
                         await Promise.race([
                             entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
                             entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
                         ]);
-                        console.log("[Connection State] Reconnected");
+                        console.log("[Connection State] Ignoring Disconnect")
+                        connection.subscribe(this.player_);
                         // Seems to be reconnecting to a new channel - ignore disconnect
                     } catch (error) {
                         // Seems to be a real disconnect which SHOULDN'T be recovered from
+                        console.log("[Connection State] Destroyed")
                         connection.destroy();
-                        this.voiceChannel_ = null;
-                        console.log("[Connection State] Disconnected");
-                    }    
-                }     
-            })
+                    }
+                }
+            });
+
+            return this.start();
+        } else {
+            console.log("[VC] Already joined");
+            return this.start(); // Check if something needs to be played
+        }        
+    }
+
+    // This function is run whenever there is a possibility that music needs to be played (e.g. on add command or play command)
+    // Except it checks that a song isn't already being played before starting.
+    async start() {
+        if(this.queue_.state == QUEUE_STATE.STOP) {
+            return this.nextSong();
+        }
+        return true;
+    }
+
+    // This stops the current song, and changes to the next song
+    async nextSong() {
+        // Get next song
+        let song = this.queue_.getSong();
+        if(song == null) {
+            return false;
+        }
+
+
+        // Ensure that the song infomation isn't empty
+        if(song.infomation == null) {
+            this.sendMessage(":x: Error parsing song");
+            return false;
+        } else {
+            // Download song
+            const input = ytdl(song.infomation?.url, {filter: 'audioonly'}); // Download
+
+            this.sendMessage(bold("Now Playing: ") +  song.infomation.name);
+
+            const resource = createAudioResource(input); // Create resource
+            this.player_.play(resource); // Play resource
+
+            return true;
         }
     }
-
-    // Disconnect from the voice call
-    async disconnect() {
-        return new Promise<void>((resolve, reject) => {
-            if(this.voiceChannel_ != null) {
-                // Get the connection
-                try {
-                    let connection = getVoiceConnection(this.voiceChannel_.guildId); // Get the connection
-                    connection?.disconnect(); // Send Disconnect Messagge
-                    resolve();
-                } catch (error) {
-                    reject();
-                }
-                
-            }
-        })
-        
-    }
-
-
-
 }
 
 export default State;

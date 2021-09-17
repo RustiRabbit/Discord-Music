@@ -4,8 +4,6 @@ import Command from "../modules/commands/Command";
 import VoiceHelper from "../modules/Voice/VoiceHelper";
 
 import ytdl from 'ytdl-core';
-import { Readable, Stream, Transform } from "stream";
-import { createReadStream, createWriteStream, fstat, ReadStream, WriteStream } from "fs";
 
 class TestPlay extends Command {
     constructor() {

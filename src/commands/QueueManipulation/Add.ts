@@ -1,5 +1,5 @@
 import { SlashCommandStringOption } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, TextBasedChannels } from "discord.js";
 import { applicationState } from "../..";
 import Command from "../../modules/commands/Command";
 
@@ -20,6 +20,8 @@ class Add extends Command {
         if(interaction.options.getString("query") != null) {
             let server = await applicationState.getServer(interaction.guildId as string);
             let state = server.state;
+
+            state.setMessageChannel(interaction.channel as TextBasedChannels);
 
             await interaction.deferReply();
 
