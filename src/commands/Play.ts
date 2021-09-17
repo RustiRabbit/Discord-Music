@@ -1,9 +1,8 @@
-import {  SlashCommandStringOption } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, TextBasedChannels } from "discord.js";
 import { applicationState } from "..";
 import Command from "../modules/commands/Command";
 import Messages from "../modules/Messages";
-import VoicePermissions from "../modules/Voice/VoicePermissions";
+import VoiceHelper from "../modules/Voice/VoiceHelper";
 
 // This command joins the vc
 class Play extends Command {
@@ -11,11 +10,30 @@ class Play extends Command {
         super();
         this.setCommandString("play");
         this.setDescription("Start the player");
-
-
     }
 
     async interactionCreate(interaction: CommandInteraction) {
+        // Join Voice Channel
+        // Get Current Voice Channel
+        let channel = VoiceHelper.GetVoiceChat(interaction);
+
+        // User not in a voice channel
+        if(channel == null) {
+            interaction.reply(Messages.NotInVC());
+            return;
+        }
+
+        // Otherwise continue and join
+        let server = await applicationState.getServer(interaction.guildId as string);
+        let state = server.state;
+
+        state.setMessageChannel(interaction.channel as TextBasedChannels);
+
+        if(await state.connectAudio(channel) == true) {
+            interaction.reply(":thumbsup:");
+        } else {
+            interaction.reply(":x: Failed to join vc");
+        }
     }
 }
 
