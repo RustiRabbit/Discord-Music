@@ -1,5 +1,5 @@
 import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
-import { CommandInteraction, StageChannel, TextBasedChannel, TextBasedChannels, VoiceChannel } from "discord.js";
+import { CommandInteraction, StageChannel, TextBasedChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
 import Messages from "../Messages";
 import PlayingQueue, { QUEUE_STATE } from "../PlayingQueue";
 import Video, { INPUT_TYPE } from "../Video";
