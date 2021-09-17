@@ -1,12 +1,13 @@
 import { CommandInteraction } from "discord.js";
 import Messages from "../Messaages";
+import PlayingQueue from "../Queue";
 import Video, { INPUT_TYPE } from "../Video";
 
 class State {
-    private queue_:Array<Video>;
+    private queue_:PlayingQueue;
 
     constructor() {
-        this.queue_ = [];
+        this.queue_ = new PlayingQueue();
     }
 
     async addVideo(input: string, interaction: CommandInteraction) {
@@ -15,7 +16,7 @@ class State {
         interaction.editReply(Messages.Search(info.url) + "\n" + Messages.Found(info.name));
     
         // Add to the queue
-        this.queue_.push(video);
+        this.queue_.addVideo(video);
     }
 
     get queue() {
