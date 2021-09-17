@@ -18,8 +18,8 @@ class State {
         let video = new Video(input, INPUT_TYPE.URL);
         let info = await video.searchVideo();
         //If a video result is found then normal message, otherwise handle with error message
+        let responseEmbed:MessageEmbed = new MessageEmbed();
         if (info != null) {
-            let responseEmbed:MessageEmbed = new MessageEmbed();
             responseEmbed.setTitle("Song Added to Queue");
             responseEmbed.setThumbnail(info.thumbnail);
             responseEmbed.addField(info.name,info.length,true);
@@ -27,9 +27,11 @@ class State {
             interaction.editReply({embeds: [responseEmbed]});
         } else {
             if (video.search.type == INPUT_TYPE.SEARCH) {
-                interaction.editReply("No results found");
+                responseEmbed.setTitle("No results found");
+                interaction.editReply({embeds: [responseEmbed]});
             } else {
-                interaction.editReply("Invalid URL")
+                responseEmbed.setTitle("Invalid URL");
+                interaction.editReply({embeds: [responseEmbed]});
             }
         }
     
