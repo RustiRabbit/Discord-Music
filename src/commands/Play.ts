@@ -2,7 +2,8 @@ import { CommandInteraction, TextBasedChannels } from "discord.js";
 import { applicationState } from "..";
 import Command from "../modules/commands/Command";
 import Messages from "../modules/Messages";
-import VoiceHelper from "../modules/Voice/VoiceHelper";
+import PLAYING_STATUS from "../modules/types/PlayingStatus";
+import VoiceHelper from "../modules/voice/VoiceHelper";
 
 // This command joins the vc
 class Play extends Command {
@@ -32,7 +33,7 @@ class Play extends Command {
 
         state.setMessageChannel(interaction.channel as TextBasedChannels);
 
-        if(await state.connectAudio(channel) == true) {
+        if(await state.connectAudio(channel) == PLAYING_STATUS.Playing) {
             interaction.reply(":thumbsup:");
         } else {
             interaction.reply(":x: Failed to join vc");

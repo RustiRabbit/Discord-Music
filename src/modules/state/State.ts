@@ -1,11 +1,11 @@
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
-import { CommandInteraction, StageChannel, TextBasedChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
+import { AudioPlayer, AudioPlayerStatus, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
+import { CommandInteraction, StageChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
 import Messages from "../Messages";
 import PlayingQueue, { QUEUE_STATE } from "../PlayingQueue";
 import Video, { INPUT_TYPE } from "../Video";
-import VoiceHelper from "../Voice/VoiceHelper";
 import ytdl from 'ytdl-core';
 import { bold } from "@discordjs/builders";
+import PLAYING_STATUS from "../types/PlayingStatus";
 
 /*
 State class
@@ -132,7 +132,7 @@ class State {
         if(this.queue_.state == QUEUE_STATE.STOP) {
             return this.nextSong();
         }
-        return true;
+        return PLAYING_STATUS.Playing;
     }
 
     // This stops the current song, and changes to the next song
@@ -141,7 +141,7 @@ class State {
         let song = this.queue_.getSong();
         if(song == null) {
             this.player_.stop();
-            return false;
+            return PLAYING_STATUS.Empty;
         }
 
 
@@ -149,7 +149,7 @@ class State {
         if(song.infomation == null) {
             this.sendMessage(":x: Error parsing song");
             this.player_.stop();
-            return false;
+            return PLAYING_STATUS.Error;
         } else {
             // Download song
             const input = ytdl(song.infomation?.url, {filter: 'audioonly'}); // Download
@@ -159,11 +159,9 @@ class State {
             const resource = createAudioResource(input); // Create resource
             this.player_.play(resource); // Play resource
 
-            return true;
+            return PLAYING_STATUS.Playing;
         }
     }
-
-
 }
 
 export default State;

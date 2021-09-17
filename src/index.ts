@@ -1,6 +1,6 @@
 // Import Libraries
 import CONFIG from "./config";
-import { Client, CommandInteraction, Intents, Interaction } from "discord.js";
+import { Client, Intents, Interaction } from "discord.js";
 import { generateDependencyReport } from "@discordjs/voice";
 
 // Import command handler

@@ -1,7 +1,7 @@
 import { AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, entersState, joinVoiceChannel, PlayerSubscription, VoiceConnectionStatus } from "@discordjs/voice";
 import { CommandInteraction, VoiceChannel } from "discord.js";
 import Command from "../modules/commands/Command";
-import VoiceHelper from "../modules/Voice/VoiceHelper";
+import VoiceHelper from "../modules/voice/VoiceHelper";
 
 import ytdl from 'ytdl-core';
 
