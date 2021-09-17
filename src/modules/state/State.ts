@@ -119,6 +119,7 @@ class State {
         // Get next song
         let song = this.queue_.getSong();
         if(song == null) {
+            this.player_.stop();
             return false;
         }
 
@@ -126,6 +127,7 @@ class State {
         // Ensure that the song infomation isn't empty
         if(song.infomation == null) {
             this.sendMessage(":x: Error parsing song");
+            this.player_.stop();
             return false;
         } else {
             // Download song
@@ -140,7 +142,7 @@ class State {
         }
     }
 
-    
+
 }
 
 export default State;

@@ -17,6 +17,8 @@ class Skip extends Command {
 
         if(await state.nextSong() == true) {
             interaction.editReply("Skipped");
+        } else {
+            interaction.editReply("[Todo - Either could mean error or end of queue /shrug]");
         }
     }
 }
