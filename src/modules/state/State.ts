@@ -108,6 +108,9 @@ class State {
     // This function is run whenever there is a possibility that music needs to be played (e.g. on add command or play command)
     // Except it checks that a song isn't already being played before starting.
     async start() {
+        if(this.queue_.state == QUEUE_STATE.PAUSE) {
+            this.unpause();
+        }
         if(this.queue_.state == QUEUE_STATE.STOP) {
             return this.nextSong();
         }
@@ -142,6 +145,16 @@ class State {
         }
     }
 
+    // Pauses
+    pause() {
+        this.player_.pause();
+        this.queue_.pause();
+    }
+
+    private unpause() {
+        this.player_.unpause();
+        this.queue_.unpause();
+    }
 
 }
 

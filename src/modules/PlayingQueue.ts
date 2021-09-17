@@ -5,7 +5,8 @@ import Video from "./Video";
 
 enum QUEUE_STATE {
     PLAY = 0,
-    STOP = 1
+    PAUSE = 1,
+    STOP = 2
 }
 
 class PlayingQueue {
@@ -49,6 +50,15 @@ class PlayingQueue {
     finished()  {
         this.currentlyPlaying_ = null;
         this.state_ = QUEUE_STATE.STOP;
+    }
+
+    // Pause
+    pause() {
+        this.state_ = QUEUE_STATE.PAUSE;
+    }
+
+    unpause() {
+        this.state_ = QUEUE_STATE.PLAY;
     }
 
     // Gets the next song
