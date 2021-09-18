@@ -12,6 +12,7 @@ import Play from "./commands/Play";
 import Add from "./commands/QueueManipulation/Add";
 import Queue from "./commands/QueueManipulation/Queue";
 import Skip from "./commands/QueueManipulation/Skip";
+import Pause from "./commands/QueueManipulation/Pause";
 
 // Create Discord Client
 const client = new Client({ intents: [
@@ -29,6 +30,7 @@ handler.registerCommands(new Play());
 handler.registerCommands(new Queue());
 handler.registerCommands(new Add());
 handler.registerCommands(new Skip());
+handler.registerCommands(new Pause());
 
 // Create State Handler
 const applicationState = new StateManager();
