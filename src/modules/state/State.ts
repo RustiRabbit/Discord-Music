@@ -50,29 +50,34 @@ class State {
 
     // Queue
     async addVideo(input: string, interaction: CommandInteraction) {
-        interaction.editReply(Messages.Search(input));
-        let video = new Video(input, INPUT_TYPE.URL);
-        let info = await video.searchVideo();
-        //If a video result is found then normal message, otherwise handle with error message
-        let responseEmbed:MessageEmbed = new MessageEmbed();
-        if (info != null) {
-            responseEmbed.setTitle("Song Added to Queue");
-            responseEmbed.setThumbnail(info.thumbnail);
-            responseEmbed.addField(info.name,info.length,true);
-            responseEmbed.setURL(info.url);
-            interaction.editReply({embeds: [responseEmbed]});
-        } else {
-            if (video.search.type == INPUT_TYPE.SEARCH) {
-                responseEmbed.setTitle("No results found");
+        return new Promise<void>(async (resolve, reject) => {
+            interaction.editReply(Messages.Search(input));
+            let video = new Video(input, INPUT_TYPE.URL);
+            let info = await video.searchVideo();
+            //If a video result is found then normal message, otherwise handle with error message
+            let responseEmbed:MessageEmbed = new MessageEmbed();
+            if (info != null) {
+                responseEmbed.setTitle("Song Added to Queue");
+                responseEmbed.setThumbnail(info.thumbnail);
+                responseEmbed.addField(info.name,info.length,true);
+                responseEmbed.setURL(info.url);
                 interaction.editReply({embeds: [responseEmbed]});
             } else {
-                responseEmbed.setTitle("Invalid URL");
-                interaction.editReply({embeds: [responseEmbed]});
+                if (video.search.type == INPUT_TYPE.SEARCH) {
+                    responseEmbed.setTitle("No results found");
+                    interaction.editReply({embeds: [responseEmbed]});
+                } else {
+                    responseEmbed.setTitle("Invalid URL");
+                    interaction.editReply({embeds: [responseEmbed]});
+                }
             }
-        }
-    
-        // Add to the queue
-        this.queue_.addVideo(video);
+        
+            // Add to the queue
+            this.queue_.addVideo(video);
+
+            resolve();
+        })
+        
     }
 
 

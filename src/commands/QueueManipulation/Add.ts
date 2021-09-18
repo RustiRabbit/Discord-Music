@@ -1,7 +1,9 @@
-import { SlashCommandStringOption } from "@discordjs/builders";
-import { CommandInteraction, TextBasedChannels } from "discord.js";
+import { channelMention, SlashCommandStringOption } from "@discordjs/builders";
+import { CommandInteraction, Message, TextBasedChannels } from "discord.js";
 import { applicationState } from "../..";
 import Command from "../../modules/commands/Command";
+import Messages from "../../modules/Messages";
+import VoiceHelper from "../../modules/voice/VoiceHelper";
 
 class Add extends Command {
     constructor() {
@@ -25,7 +27,17 @@ class Add extends Command {
 
             await interaction.deferReply();
 
-            state.addVideo(interaction.options.getString("query") as string, interaction);
+            let channel = VoiceHelper.GetVoiceChat(interaction);
+            if(channel != null) {
+                await state.addVideo(interaction.options.getString("query") as string, interaction);
+        
+                state.connectAudio(channel);
+                state.start();
+            } else {
+                interaction.editReply(Messages.NotInVC());
+            }
+
+            
         }
     }
 }
