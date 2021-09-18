@@ -1,4 +1,4 @@
-import { bold, quote } from "@discordjs/builders";
+import { bold, quote, underscore } from "@discordjs/builders";
 import { MessageEmbed } from "discord.js";
 import Messages from "./Messages";
 import Video from "./Video";
@@ -34,11 +34,15 @@ class PlayingQueue {
         
         // Check Curently Playing
         if(this.currentlyPlaying_ != null) {
-            message += bold("Currently Playing:") + "\n" + this.currentlyPlaying_.infomation?.name + "\n\n";
+            message += underscore("Now Playing:") + "\n [" + this.currentlyPlaying_.infomation?.name + "]" + "(" + this.currentlyPlaying_.infomation?.url + ") | " + "`" + this.currentlyPlaying_.infomation?.length + "`\n";
+        }
+
+        if(this.list_.length != 0) {
+            message += underscore("Next:") + "\n";
         }
 
         for(var i = 0; i < this.list_.length; i++) {
-            message += "`" + (i + 1) + ".` - " + this.list_[i].infomation?.name + "\n\n";
+            message += "`" + (i+1) + ".` " + "[" + this.list_[i].infomation?.name + "](" + this.list_[i].infomation?.url + ") | `" + this.list_[i].infomation?.length + "`"
         }
 
         Embed.setDescription(message);
