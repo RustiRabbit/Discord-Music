@@ -1,7 +1,7 @@
 import { bold, quote } from "@discordjs/builders";
 import { MessageEmbed } from "discord.js";
 import Messages from "./Messages";
-import Video from "./Video";
+import {SearchResult, VideoInformation} from "./Search";
 
 enum QUEUE_STATE {
     PLAY = 0,
@@ -10,8 +10,8 @@ enum QUEUE_STATE {
 
 class PlayingQueue {
     private state_: QUEUE_STATE; // Queue Status
-    private currentlyPlaying_: Video | null; // Currently Playing Video
-    private list_:Array<Video>; // Queue list
+    private currentlyPlaying_: VideoInformation | null; // Currently Playing Video
+    private list_:Array<VideoInformation>; // Queue list
 
     constructor() {
         this.state_ = QUEUE_STATE.STOP;
@@ -20,7 +20,7 @@ class PlayingQueue {
     }
 
     // Queue Modification
-    addVideo(video: Video) {
+    addVideo(video: VideoInformation) {
         this.list_.push(video);
     }
 
@@ -33,11 +33,11 @@ class PlayingQueue {
         
         // Check Curently Playing
         if(this.currentlyPlaying_ != null) {
-            message += bold("Currently Playing:") + "\n" + this.currentlyPlaying_.infomation?.name + "\n\n";
+            message += bold("Currently Playing:") + "\n" + this.currentlyPlaying_.name + "\n\n";
         }
 
         for(var i = 0; i < this.list_.length; i++) {
-            message += "`" + (i + 1) + ".` - " + this.list_[i].infomation?.name + "\n\n";
+            message += "`" + (i + 1) + ".` - " + this.list_[i].name + "\n\n";
         }
 
         Embed.setDescription(message);

@@ -2,7 +2,7 @@ import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource,
 import { CommandInteraction, StageChannel, TextBasedChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
 import Messages from "../Messages";
 import PlayingQueue, { QUEUE_STATE } from "../PlayingQueue";
-import Video, { INPUT_TYPE } from "../Video";
+import SearchHelper, { URL_TYPE } from "../Search";
 import VoiceHelper from "../Voice/VoiceHelper";
 import ytdl from 'ytdl-core';
 import { bold } from "@discordjs/builders";
@@ -51,28 +51,21 @@ class State {
     // Queue
     async addVideo(input: string, interaction: CommandInteraction) {
         interaction.editReply(Messages.Search(input));
-        let video = new Video(input, INPUT_TYPE.URL);
-        let info = await video.searchVideo();
-        //If a video result is found then normal message, otherwise handle with error message
-        let responseEmbed:MessageEmbed = new MessageEmbed();
-        if (info != null) {
-            responseEmbed.setTitle("Song Added to Queue");
-            responseEmbed.setThumbnail(info.thumbnail);
-            responseEmbed.addField(info.name,info.length,true);
-            responseEmbed.setURL(info.url);
-            interaction.editReply({embeds: [responseEmbed]});
-        } else {
-            if (video.search.type == INPUT_TYPE.SEARCH) {
-                responseEmbed.setTitle("No results found");
-                interaction.editReply({embeds: [responseEmbed]});
-            } else {
-                responseEmbed.setTitle("Invalid URL");
-                interaction.editReply({embeds: [responseEmbed]});
-            }
-        }
+        //let video = new Video(input, INPUT_TYPE.URL);
+        //let info = await video.searchVideo();
+        //let responseEmbed:MessageEmbed = new MessageEmbed();
+        let searchResult = await SearchHelper.search(input);
+        //Add user who requested and send
+        searchResult.resultMessage.addField("Requested by:","```" + interaction.member?.user.username + "```");
+        interaction.editReply({embeds: [searchResult.resultMessage]});
     
         // Add to the queue
-        this.queue_.addVideo(video);
+        // If error ignore, otherwise loop and add
+        if (searchResult.resultInfo.length > 0) {
+            for (let i = 0; i < searchResult.resultInfo.length; i++) {
+                this.queue_.addVideo(searchResult.resultInfo[i]);
+            }
+        }
     }
 
 
@@ -146,15 +139,15 @@ class State {
 
 
         // Ensure that the song infomation isn't empty
-        if(song.infomation == null) {
+        if(song == null) {
             this.sendMessage(":x: Error parsing song");
             this.player_.stop();
             return false;
         } else {
             // Download song
-            const input = ytdl(song.infomation?.url, {filter: 'audioonly'}); // Download
+            const input = ytdl(song.url, {filter: 'audioonly'}); // Download
 
-            this.sendMessage(bold("Now Playing: ") +  song.infomation.name);
+            this.sendMessage(bold("Now Playing: ") +  song.name);
 
             const resource = createAudioResource(input); // Create resource
             this.player_.play(resource); // Play resource
