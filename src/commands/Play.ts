@@ -23,7 +23,7 @@ class Play extends Command {
 
         // User not in a voice channel
         if(channel == null) {
-            interaction.reply(Messages.NotInVC());
+            interaction.reply(Messages.Error.NotInVC());
             return;
         }
 
@@ -33,10 +33,15 @@ class Play extends Command {
 
         state.setMessageChannel(interaction.channel as TextBasedChannels);
 
-        if(await state.connectAudio(channel) == PLAYING_STATUS.Playing) {
-            interaction.reply(":thumbsup:");
+        let connection = await state.connectAudio(channel);
+
+        if(connection == PLAYING_STATUS.Playing) {
+            interaction.reply(Messages.VC.Join());
+        } else if(connection == PLAYING_STATUS.Empty) {
+            interaction.reply(Messages.VC.Join() + "\n" + Messages.Queue.Empty());
         } else {
-            interaction.reply(":x: Failed to join vc");
+            interaction.reply(Messages.Error.FailedToJoinVC());
+
         }
     }
 }

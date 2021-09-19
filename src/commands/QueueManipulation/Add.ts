@@ -34,7 +34,7 @@ class Add extends Command {
                 state.connectAudio(channel);
                 state.start();
             } else {
-                interaction.editReply(Messages.NotInVC());
+                interaction.editReply(Messages.Error.NotInVC());
             }
 
             

@@ -31,8 +31,9 @@ class State {
             console.log("[Player] Playing");
         })
 
-        this.player_.on('error', () => {
-            console.log("Found error lol");
+        this.player_.on('error', (error) => {
+            console.log("[Player] Error");
+            console.log(error)
         })
     }
 
@@ -51,7 +52,7 @@ class State {
     // Queue
     async addVideo(input: string, interaction: CommandInteraction) {
         return new Promise<void>(async (resolve, reject) => {
-            interaction.editReply(Messages.Search(input));
+            interaction.editReply(Messages.Add.Search(input));
             let video = new Video(input, INPUT_TYPE.URL);
             let info = await video.searchVideo();
             //If a video result is found then normal message, otherwise handle with error message
@@ -155,7 +156,7 @@ class State {
 
         // Ensure that the song infomation isn't empty
         if(song.infomation == null) {
-            this.sendMessage(":x: Error parsing song");
+            this.sendMessage(Messages.Error.ErrorParsingSong());
             this.player_.stop();
             return PLAYING_STATUS.Error;
         } else {

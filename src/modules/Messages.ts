@@ -4,25 +4,51 @@ Holds all responses to commands
 Essentially just centralises for ease of access for editing
 */
 const Messages = {
-    Search: (url: string) => {
-        return ":mag_right: Searching for `" + url + "`";
+    Error: {
+        FailedToJoinVC: () => {
+            return "Failed to join the vc";
+        },
+        PlayerError: () => {
+            return "The Audio Player returned an error that interrupted playing";
+        },
+        NotInVC: () => {
+            return "Not in a voice chat";
+        },
+        ErrorParsingSong: () => {
+            return "Error: Parsing Song";
+        },
+        GenericError: () => {
+            return "Error";
+        }
     },
-    Found: (name: string) => {
-        return "Found video `" + name + "`";
+    Add: {
+        Search: (term: string) => {
+            return ":mag_right: Searching for `" + term + "`";
+        },
+        Found: (term: string) => {
+            return "Found video `" + name + "`";
+        }
     },
-    NotInVC: () => {
-        return "Whoops! Looks like you're not in a voice channel! :flushed:  Try again when you are! :zany_face: :kissing_heart:";
+    Queue: {
+        Empty: () => {
+            return "Queue Empty";
+        },
+        Skipped: () => {
+            return "Skipped";
+        },
+        Finished: () => {
+            return "Queue Finished";
+        }    
     },
-    Left: {
-        Manually: () => {
+    VC: {
+        Join: () => {
+            return ":thumbsup:";
+        },
+        Leave: () => {
             return ":wave:";
         }
-    },
-    Error: {
-        FailedToJoin: () => {
-            return "Failed to join vc";
-        }
     }
+
 }
 
 export default Messages;

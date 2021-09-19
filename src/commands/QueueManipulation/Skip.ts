@@ -1,6 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import { applicationState } from "../..";
 import Command from "../../modules/commands/Command";
+import Messages from "../../modules/Messages";
 import PLAYING_STATUS from "../../modules/types/PlayingStatus";
 
 class Skip extends Command {
@@ -19,11 +20,11 @@ class Skip extends Command {
         let nextSong = await state.nextSong(); // Gets the next song state
 
         if(nextSong == PLAYING_STATUS.Playing) { // Playing next song
-            interaction.editReply("Skipped");
+            interaction.editReply(Messages.Queue.Skipped());
         } else if(nextSong == PLAYING_STATUS.Empty) { // No next song, queue empty
-            interaction.editReply("Queue Finished");
+            interaction.editReply(Messages.Queue.Finished());
         } else if(nextSong == PLAYING_STATUS.Error) { // Error
-            interaction.editReply("Error");
+            interaction.editReply(Messages.Error.GenericError());
         }
     }
 }
