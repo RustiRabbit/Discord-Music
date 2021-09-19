@@ -1,9 +1,8 @@
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
-import { CommandInteraction, StageChannel, TextBasedChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
+import { AudioPlayer, AudioPlayerStatus, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
+import { CommandInteraction, StageChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
 import Messages from "../Messages";
 import PlayingQueue, { QUEUE_STATE } from "../PlayingQueue";
 import SearchHelper, { URL_TYPE } from "../Search";
-import VoiceHelper from "../Voice/VoiceHelper";
 import ytdl from 'ytdl-core';
 import { bold } from "@discordjs/builders";
 
@@ -31,8 +30,9 @@ class State {
             console.log("[Player] Playing");
         })
 
-        this.player_.on('error', () => {
-            console.log("Found error lol");
+        this.player_.on('error', (error) => {
+            console.log("[Player] THe player reported an error");
+            console.log(error);
         })
     }
 
