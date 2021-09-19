@@ -1,18 +1,17 @@
-import { bold, quote, underscore } from "@discordjs/builders";
+import { bold, quote } from "@discordjs/builders";
 import { MessageEmbed } from "discord.js";
 import Messages from "./Messages";
-import Video from "./Video";
+import {SearchResult, VideoInformation} from "./Search";
 
 enum QUEUE_STATE {
     PLAY = 0,
-    PAUSE = 1,
-    STOP = 2
+    STOP = 1
 }
 
 class PlayingQueue {
     private state_: QUEUE_STATE; // Queue Status
-    private currentlyPlaying_: Video | null; // Currently Playing Video
-    private list_:Array<Video>; // Queue list
+    private currentlyPlaying_: VideoInformation | null; // Currently Playing Video
+    private list_:Array<VideoInformation>; // Queue list
 
     constructor() {
         this.state_ = QUEUE_STATE.STOP;
@@ -21,7 +20,7 @@ class PlayingQueue {
     }
 
     // Queue Modification
-    addVideo(video: Video) {
+    addVideo(video: VideoInformation) {
         this.list_.push(video);
     }
 
@@ -34,15 +33,11 @@ class PlayingQueue {
         
         // Check Curently Playing
         if(this.currentlyPlaying_ != null) {
-            message += underscore("Now Playing:") + "\n [" + this.currentlyPlaying_.infomation?.name + "]" + "(" + this.currentlyPlaying_.infomation?.url + ") | " + "`" + this.currentlyPlaying_.infomation?.length + "`\n";
-        }
-
-        if(this.list_.length != 0) {
-            message += underscore("Next:") + "\n";
+            message += bold("Currently Playing:") + "\n" + this.currentlyPlaying_.name + "\n\n";
         }
 
         for(var i = 0; i < this.list_.length; i++) {
-            message += "`" + (i+1) + ".` " + "[" + this.list_[i].infomation?.name + "](" + this.list_[i].infomation?.url + ") | `" + this.list_[i].infomation?.length + "`"
+            message += "`" + (i + 1) + ".` - " + this.list_[i].name + "\n\n";
         }
 
         Embed.setDescription(message);
@@ -54,15 +49,6 @@ class PlayingQueue {
     finished()  {
         this.currentlyPlaying_ = null;
         this.state_ = QUEUE_STATE.STOP;
-    }
-
-    // Pause
-    pause() {
-        this.state_ = QUEUE_STATE.PAUSE;
-    }
-
-    unpause() {
-        this.state_ = QUEUE_STATE.PLAY;
     }
 
     // Gets the next song

@@ -2,10 +2,9 @@ import { AudioPlayer, AudioPlayerStatus, createAudioResource, entersState, getVo
 import { CommandInteraction, StageChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
 import Messages from "../Messages";
 import PlayingQueue, { QUEUE_STATE } from "../PlayingQueue";
-import Video, { INPUT_TYPE } from "../Video";
+import SearchHelper, { URL_TYPE } from "../Search";
 import ytdl from 'ytdl-core';
 import { bold } from "@discordjs/builders";
-import PLAYING_STATUS from "../types/PlayingStatus";
 
 /*
 State class
@@ -31,8 +30,9 @@ class State {
             console.log("[Player] Playing");
         })
 
-        this.player_.on('error', () => {
-            console.log("Found error lol");
+        this.player_.on('error', (error) => {
+            console.log("[Player] THe player reported an error");
+            console.log(error);
         })
     }
 
@@ -50,34 +50,19 @@ class State {
 
     // Queue
     async addVideo(input: string, interaction: CommandInteraction) {
-        return new Promise<void>(async (resolve, reject) => {
-            interaction.editReply(Messages.Search(input));
-            let video = new Video(input, INPUT_TYPE.URL);
-            let info = await video.searchVideo();
-            //If a video result is found then normal message, otherwise handle with error message
-            let responseEmbed:MessageEmbed = new MessageEmbed();
-            if (info != null) {
-                responseEmbed.setTitle("Song Added to Queue");
-                responseEmbed.setThumbnail(info.thumbnail);
-                responseEmbed.addField(info.name,info.length,true);
-                responseEmbed.setURL(info.url);
-                interaction.editReply({embeds: [responseEmbed]});
-            } else {
-                if (video.search.type == INPUT_TYPE.SEARCH) {
-                    responseEmbed.setTitle("No results found");
-                    interaction.editReply({embeds: [responseEmbed]});
-                } else {
-                    responseEmbed.setTitle("Invalid URL");
-                    interaction.editReply({embeds: [responseEmbed]});
-                }
+        interaction.editReply(Messages.Search(input));
+        let searchResult = await SearchHelper.search(input);
+        //Add user who requested and send
+        searchResult.resultMessage.addField("Requested by:","`" + interaction.member?.user.username + "`");
+        interaction.editReply({embeds: [searchResult.resultMessage]});
+    
+        // Add to the queue
+        // If error ignore, otherwise loop and add
+        if (searchResult.resultInfo.length > 0) {
+            for (let i = 0; i < searchResult.resultInfo.length; i++) {
+                this.queue_.addVideo(searchResult.resultInfo[i]);
             }
-        
-            // Add to the queue
-            this.queue_.addVideo(video);
-
-            resolve();
-        })
-        
+        }
     }
 
 
@@ -134,13 +119,10 @@ class State {
     // This function is run whenever there is a possibility that music needs to be played (e.g. on add command or play command)
     // Except it checks that a song isn't already being played before starting.
     async start() {
-        if(this.queue_.state == QUEUE_STATE.PAUSE) {
-            this.unpause();
-        }
         if(this.queue_.state == QUEUE_STATE.STOP) {
             return this.nextSong();
         }
-        return PLAYING_STATUS.Playing;
+        return true;
     }
 
     // This stops the current song, and changes to the next song
@@ -149,38 +131,28 @@ class State {
         let song = this.queue_.getSong();
         if(song == null) {
             this.player_.stop();
-            return PLAYING_STATUS.Empty;
+            return false;
         }
 
 
         // Ensure that the song infomation isn't empty
-        if(song.infomation == null) {
+        if(song == null) {
             this.sendMessage(":x: Error parsing song");
             this.player_.stop();
-            return PLAYING_STATUS.Error;
+            return false;
         } else {
             // Download song
-            const input = ytdl(song.infomation?.url, {filter: 'audioonly'}); // Download
+            const input = ytdl(song.url, {filter: 'audioonly'}); // Download
 
-            this.sendMessage(bold("Now Playing: ") +  song.infomation.name);
+            this.sendMessage(bold("Now Playing: ") +  song.name);
 
             const resource = createAudioResource(input); // Create resource
             this.player_.play(resource); // Play resource
 
-            return PLAYING_STATUS.Playing;
+            return true;
         }
     }
 
-    // Pauses
-    pause() {
-        this.player_.pause();
-        this.queue_.pause();
-    }
-
-    private unpause() {
-        this.player_.unpause();
-        this.queue_.unpause();
-    }
 
 }
 
