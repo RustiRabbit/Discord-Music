@@ -51,9 +51,6 @@ class State {
     // Queue
     async addVideo(input: string, interaction: CommandInteraction) {
         interaction.editReply(Messages.Search(input));
-        //let video = new Video(input, INPUT_TYPE.URL);
-        //let info = await video.searchVideo();
-        //let responseEmbed:MessageEmbed = new MessageEmbed();
         let searchResult = await SearchHelper.search(input);
         //Add user who requested and send
         searchResult.resultMessage.addField("Requested by:","```" + interaction.member?.user.username + "```");

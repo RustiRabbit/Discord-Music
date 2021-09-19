@@ -136,7 +136,6 @@ const SearchHelper = {
                         displayLength: this.formatVideoTime(output.duration),
                         thumbnail: output.thumbnail,
                     });
-                    console.log(output);
                     //Create output message to return
                     result.resultMessage.setTitle("Song Added to Queue");
                     result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
