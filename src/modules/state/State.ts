@@ -53,7 +53,7 @@ class State {
         interaction.editReply(Messages.Search(input));
         let searchResult = await SearchHelper.search(input);
         //Add user who requested and send
-        searchResult.resultMessage.addField("Requested by:","```" + interaction.member?.user.username + "```");
+        searchResult.resultMessage.addField("Requested by:","`" + interaction.member?.user.username + "`");
         interaction.editReply({embeds: [searchResult.resultMessage]});
     
         // Add to the queue

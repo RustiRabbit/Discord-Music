@@ -125,8 +125,27 @@ const SearchHelper = {
             }).then(output => {
                 let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed()};
                 //Handle output based on handletype
-                if (handleType === URL_TYPE.PLAYLIST) {
-                    //TODO handle playtlist
+                if (handleType === URL_TYPE.PLAYLIST) { //If handling as playlist
+                    //Loop entries and add to return variable
+                    let outputPlaylist = (output as any);
+                    let playlistDuration:number = 0;
+                    for (let i = 0; i < outputPlaylist.entries.length; i++) {
+                        let curEntry = outputPlaylist.entries[i];
+                        playlistDuration += curEntry.duration;
+                        result.resultInfo.push({
+                            name: curEntry.title,
+                            url: curEntry.webpage_url,
+                            length: curEntry.duration,
+                            displayLength: this.formatVideoTime(curEntry.duration),
+                            thumbnail: curEntry.thumbnail,
+                        });
+                    }
+                    //Create output message
+                    result.resultMessage.setTitle("Playlist Added to Queue");
+                    result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                    result.resultMessage.addField(output.title, String(this.formatVideoTime(playlistDuration)));
+                    result.resultMessage.setURL(output.webpage_url);
+                    
                 } else if (handleType === URL_TYPE.VIDEO) { //If handling as video
                     //Move output of youtubedl into return variable (also formatting time)
                     result.resultInfo.push({
