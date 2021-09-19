@@ -3,7 +3,7 @@ import { applicationState } from "..";
 import Command from "../modules/commands/Command";
 import Messages from "../modules/Messages";
 import PLAYING_STATUS from "../modules/types/PlayingStatus";
-import VoiceHelper from "../modules/voice/VoiceHelper";
+import VoiceHelper from "../modules/Voice/VoiceHelper";
 
 // This command joins the vc
 class Play extends Command {

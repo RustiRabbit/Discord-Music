@@ -3,7 +3,7 @@ import { CommandInteraction, Message, TextBasedChannels } from "discord.js";
 import { applicationState } from "../..";
 import Command from "../../modules/commands/Command";
 import Messages from "../../modules/Messages";
-import VoiceHelper from "../../modules/voice/VoiceHelper";
+import VoiceHelper from "../../modules/Voice/VoiceHelper";
 
 class Add extends Command {
     constructor() {
