@@ -69,7 +69,7 @@ const SearchHelper = {
 
     // Verify whether input is a youtube URL
     verifyUrl(query: string) {
-        let verify:RegExp = new RegExp("(^https://www.youtube.com/()|^www.youtube.com/|^youtube.com/)(watch\?|playlist\?)");
+        let verify:RegExp = new RegExp("((^https:\/\/www.youtube.com\/|^www.youtube.com\/|^youtube.com\/)(watch\?|playlist\?))|((^https:\/\/open.spotify.com\/|^open.spotify.com\/)(track\/|playlist\/))");
         return verify.test(query);
     },
 
