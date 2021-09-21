@@ -23,18 +23,32 @@ class State {
 
         this.player_.on(AudioPlayerStatus.Idle, () => {
             console.log("[Player] Idle");
-            this.queue_.finished();
+            
+            // Get the next song
+            this.queue_.finished(); 
+            
+            // Start the next song
             this.start();
-        })
+        });
 
         this.player_.on(AudioPlayerStatus.Playing, () => {
             console.log("[Player] Playing");
-        })
+            
+            // Start the duration
+            this.queue_.unpause();
+        });
+
+        this.player_.on(AudioPlayerStatus.Paused, () => {
+            console.log("[Player] Paused");
+            
+            // Pause the duration
+            this.queue_.pause();
+        });
 
         this.player_.on('error', (error) => {
             console.log("[Player] THe player reported an error");
             console.log(error);
-        })
+        });
     }
 
     sendMessage(text: string) {
@@ -105,7 +119,11 @@ class State {
                     } catch (error) {
                         // Seems to be a real disconnect which SHOULDN'T be recovered from
                         console.log("[Connection State] Destroyed")
-                        connection.destroy();
+                        connection.destroy(); // Destory the connection
+
+                        // Pause the currently playing timer
+                        this.queue_.pause();
+                        this.queue_.finished();
                     }
                 }
             });
