@@ -2,7 +2,7 @@ import { AudioPlayer, AudioPlayerStatus, createAudioResource, entersState, getVo
 import { CommandInteraction, StageChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
 import Messages from "../Messages";
 import PlayingQueue, { QUEUE_STATE } from "../PlayingQueue";
-import SearchHelper, { URL_TYPE } from "../Search";
+import SearchHelper from "../Search";
 import ytdl from 'ytdl-core';
 import { bold } from "@discordjs/builders";
 import PLAYING_STATUS from "../types/PlayingStatus";
@@ -16,10 +16,12 @@ class State {
     private queue_:PlayingQueue;
     private player_:AudioPlayer;
     private message_:TextBasedChannels | null = null;
+    private guildId_:string;
 
-    constructor() {
+    constructor(guildId: string) {
         this.queue_ = new PlayingQueue();
         this.player_ = new AudioPlayer();
+        this.guildId_ = guildId;
 
         this.player_.on(AudioPlayerStatus.Idle, () => {
             console.log("[Player] Idle");
@@ -133,6 +135,15 @@ class State {
             console.log("[VC] Already joined");
             return this.start(); // Check if something needs to be played
         }        
+    }
+
+    async disconnectAudio() {
+        return new Promise<void>(async (resolve, reject) => {
+            let connection = getVoiceConnection(this.guildId_);
+            connection?.disconnect();
+
+            resolve();
+        })
     }
 
     // This function is run whenever there is a possibility that music needs to be played (e.g. on add command or play command)

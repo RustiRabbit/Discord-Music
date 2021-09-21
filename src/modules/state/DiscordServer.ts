@@ -12,7 +12,7 @@ class DiscordServer {
     constructor(id: string, name: string) {
         this.id_ = id;
         this.name_ = name;
-        this.state = new State();
+        this.state = new State(this.id_);
     } 
 
     get id() {
