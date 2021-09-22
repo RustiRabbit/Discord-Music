@@ -82,6 +82,11 @@ class State {
         }
     }
 
+    async clearQueue() {
+        this.pause();
+        this.queue_.clear();
+    }
+
 
     get queue() {
         return this.queue_;

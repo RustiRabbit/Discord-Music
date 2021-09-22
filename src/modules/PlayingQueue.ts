@@ -1,4 +1,4 @@
- import { underscore } from "@discordjs/builders";
+ import { codeBlock, underscore } from "@discordjs/builders";
 import { MessageEmbed } from "discord.js";
 import { VideoInformation} from "./Search";
 
@@ -26,24 +26,38 @@ class PlayingQueue {
         this.list_.push(video);
     }
 
+    // Removes every video in the queue
+    clear() {
+        this.list_ = []; // Clear the list
+        this.currentlyPlaying_ = null; // Clear currently playing
+        this.state_ = QUEUE_STATE.STOP; // Set the state to stop
+    }
+
     // Generates a queue message, returns a message embed
     generateQueueMessage() {
         const Embed = new MessageEmbed();
         Embed.setTitle("Song Queue");
 
         let message = "";
-        
+
         // Check Curently Playing
         if(this.currentlyPlaying_ != null) {
             message += underscore("Now Playing:") + "\n [" + this.currentlyPlaying_.name + "]" + "(" + this.currentlyPlaying_.url + ") | " + "`" + this.currentlyPlaying_.displayLength + "`\n";
         }
 
+        // Add whats coming up next
         if(this.list_.length != 0) {
             message += underscore("Next:") + "\n";
         }
 
+        // Add the actual queue
         for(var i = 0; i < this.list_.length; i++) {
             message += "`" + (i+1) + ".` " + "[" + this.list_[i].name + "](" + this.list_[i].url + ") | `" + this.list_[i].displayLength + "`" + "\n";
+        }
+
+        // If the queue is empty, then show a message
+        if(this.list_.length == 0 && this.currentlyPlaying_ == null) {
+            message += "Queue is curently empty, use `/play` to add a song to the queue";
         }
 
         Embed.setDescription(message);
@@ -73,6 +87,8 @@ class PlayingQueue {
     getSong() {
         // No songs in queue - return null, handled by nextSong in the state class
         if(this.list_.length == 0) {
+            this.currentlyPlaying_ = null;
+            this.state_ = QUEUE_STATE.STOP;
             return null;
         } else { // Songs to work with
             this.currentlyPlaying_ = this.list_[0]; // Sets currently playing song
