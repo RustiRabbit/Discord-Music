@@ -38,6 +38,9 @@ const Messages = {
         },
         Finished: () => {
             return "Queue Finished";
+        },
+        Cleared: () => {
+            return "Queue has been cleared";
         }    
     },
     VC: {
@@ -46,7 +49,7 @@ const Messages = {
         },
         Leave: () => {
             return ":wave:";
-        }
+        },
     }
 
 }
