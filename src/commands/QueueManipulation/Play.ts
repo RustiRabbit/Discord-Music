@@ -5,10 +5,10 @@ import Command from "../../modules/commands/Command";
 import Messages from "../../modules/Messages";
 import VoiceHelper from "../../modules/Voice/VoiceHelper";
 
-class Add extends Command {
+class Play extends Command {
     constructor() {
         super();
-        this.setCommandString("add");
+        this.setCommandString("play");
         this.setDescription("Add a song to the queue");
 
         let nameOption: SlashCommandStringOption = new SlashCommandStringOption();
@@ -43,4 +43,4 @@ class Add extends Command {
     }
 }
 
-export default Add;
+export default Play;

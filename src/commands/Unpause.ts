@@ -6,13 +6,13 @@ import PLAYING_STATUS from "../modules/types/PlayingStatus";
 import VoiceHelper from "../modules/Voice/VoiceHelper";
 
 // This command joins the vc
-class Play extends Command {
+class Unpause extends Command {
 
     // Constructor (Sets up command logic to run)
     constructor() {
         super();
-        this.setCommandString("play");
-        this.setDescription("Start the player");
+        this.setCommandString("unpause");
+        this.setDescription("Unpause the player");
     }
 
     // Command logic
@@ -21,29 +21,24 @@ class Play extends Command {
         // Get Current Voice Channel
         let channel = VoiceHelper.GetVoiceChat(interaction);
 
-        // User not in a voice channel
-        if(channel == null) {
-            interaction.reply(Messages.Error.NotInVC());
-            return;
-        }
-
-        // Otherwise continue and join
+        // Get state
         let server = await applicationState.getServer(interaction.guildId as string);
         let state = server.state;
 
-        state.setMessageChannel(interaction.channel as TextBasedChannels);
+        // User not in a voice channel
+        if(state.connectionStatus == false) {
+            interaction.reply(Messages.Error.NotInVC());
+        }  else {
+            let connection = await state.start();
 
-        let connection = await state.connectAudio(channel);
-
-        if(connection == PLAYING_STATUS.Playing) {
-            interaction.reply(Messages.VC.Join());
-        } else if(connection == PLAYING_STATUS.Empty) {
-            interaction.reply(Messages.VC.Join() + "\n" + Messages.Queue.Empty());
-        } else {
-            interaction.reply(Messages.Error.FailedToJoinVC());
-
+            if(connection == PLAYING_STATUS.Playing) {
+                interaction.reply(Messages.VC.Unpaused());
+            } else {
+                interaction.reply(Messages.Error.GenericError());
+            }
         }
+        
     }
 }
 
-export default Play;
+export default Unpause;

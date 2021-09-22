@@ -17,6 +17,9 @@ const Messages = {
         ErrorParsingSong: () => {
             return "Error: Parsing Song";
         },
+        NothingToPlay: () => {
+            return "Nothing to play";
+        },
         GenericError: () => {
             return "Error";
         }
@@ -50,6 +53,12 @@ const Messages = {
         Leave: () => {
             return ":wave:";
         },
+        Unpaused: () => {
+            return "Unpaused";
+        },
+        Paused: () => {
+            return "Paused";
+        }
     }
 
 }

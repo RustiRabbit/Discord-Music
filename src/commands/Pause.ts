@@ -1,6 +1,7 @@
 import { CommandInteraction } from "discord.js";
-import { applicationState } from "../..";
-import Command from "../../modules/commands/Command";
+import { applicationState } from "..";
+import Command from "../modules/commands/Command";
+import Messages from "../modules/Messages";
 
 class Pause extends Command {
     constructor() {
@@ -13,9 +14,13 @@ class Pause extends Command {
         let server = await applicationState.getServer(interaction.guildId as string);
         let state = server.state;
 
-        state.pause();
+        if(state.connectionStatus == false) {
+            interaction.reply(Messages.Error.NotInVC());
+        } else {
+            state.pause();
+            interaction.reply(Messages.VC.Paused());
+        }
 
-        interaction.reply("Paused");
 
     }
 }

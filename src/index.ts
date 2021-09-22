@@ -8,14 +8,14 @@ import CommandHandler from "./modules/commands/CommandHandler";
 
 // Import commands
 import StateManager from "./modules/state/StateManager";
-import Play from "./commands/Play";
-import Add from "./commands/QueueManipulation/Add";
+import Play from "./commands/QueueManipulation/Play";
 import Queue from "./commands/QueueManipulation/Queue";
 import Skip from "./commands/QueueManipulation/Skip";
-import Pause from "./commands/QueueManipulation/Pause";
+import Pause from "./commands/Pause";
+import Clear from "./commands/QueueManipulation/Clear";
 import NowPlaying from "./commands/NowPlaying";
 import Disconnect from "./commands/Disconnect";
-import Clear from "./commands/QueueManipulation/Clear";
+import Unpause from "./commands/Unpause";
 
 // Create Discord Client
 const client = new Client({ intents: [
@@ -31,9 +31,9 @@ const handler:CommandHandler = new CommandHandler();
 // Register commands
 handler.registerCommands(new Play());
 handler.registerCommands(new Queue());
-handler.registerCommands(new Add());
 handler.registerCommands(new Skip());
 handler.registerCommands(new Pause());
+handler.registerCommands(new Unpause());
 handler.registerCommands(new NowPlaying());
 handler.registerCommands(new Disconnect());
 handler.registerCommands(new Clear());

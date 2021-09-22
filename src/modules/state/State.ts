@@ -158,6 +158,15 @@ class State {
         })
     }
 
+    get connectionStatus() { // Either returns true (meaning the bot is in a vc) or false (meaning that the bot isn't in a vc)
+        let connection = getVoiceConnection(this.guildId_);
+        if(connection != undefined) {
+            return true; 
+        } else {
+            return false;
+        }
+    }
+
     // This function is run whenever there is a possibility that music needs to be played (e.g. on add command or play command)
     // Except it checks that a song isn't already being played before starting.
     async start() {
