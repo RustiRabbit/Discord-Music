@@ -79,6 +79,9 @@ class State {
             for (let i = 0; i < searchResult.resultInfo.length; i++) {
                 this.queue_.addVideo(searchResult.resultInfo[i]);
             }
+            return true;
+        } else {
+            return false;
         }
     }
 
