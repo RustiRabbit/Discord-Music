@@ -29,12 +29,20 @@ class NowPlaying extends Command {
                 embed.setTitle("Now Playing");
 
                 const song = state.queue.currentlyPlaying.name;
+                const link = state.queue.currentlyPlaying.url;
+                const thumbnail = state.queue.currentlyPlaying.thumbnail;
+
                 const duration = SearchHelper.formatVideoTime(state.queue.timeElasped) + "/" + SearchHelper.formatVideoTime(state.queue.currentlyPlaying.length);
 
+                // Add Fields
                 embed.addFields(
-                    { name: "Currently Playing", value: song},
+                    { name: "Currently Playing", value: "[" + song + "]" + "(" + link + ")"},
                     { name: "Position",  value: duration}
                 );
+                    
+                // Add thumbnail
+                embed.setThumbnail(thumbnail);
+                
 
                 interaction.reply({embeds: [embed]});
             }
