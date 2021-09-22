@@ -29,10 +29,11 @@ class Add extends Command {
 
             let channel = VoiceHelper.GetVoiceChat(interaction);
             if(channel != null) {
-                await state.addVideo(interaction.options.getString("query") as string, interaction);
-        
-                state.connectAudio(channel);
-                state.start();
+                if(await state.addVideo(interaction.options.getString("query") as string, interaction) == true) { // Only join if the video adding was sucessful
+                    state.connectAudio(channel);
+                    state.start();
+                }
+
             } else {
                 interaction.editReply(Messages.Error.NotInVC());
             }
