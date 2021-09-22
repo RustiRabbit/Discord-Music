@@ -103,23 +103,25 @@ const SearchHelper = {
                 dumpSingleJson: true,
                 defaultSearch: "ytsearch:"
             }).then(output => {
-
-                //Move output of youtubedl into return variable (also formatting time)
-                let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed}
-                let out = (output as any).entries[0];
-                result.resultInfo.push({
-                    name: out.title,
-                    url: out.webpage_url,
-                    length: out.duration,
-                    displayLength: this.formatVideoTime(out.duration),
-                    thumbnail: output.thumbnail,
-                });
-                //Create output message to return
-                result.resultMessage.setTitle("Song Added to Queue");
-                result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
-                result.resultMessage.addField(result.resultInfo[0].name, result.resultInfo[0].displayLength);
-                result.resultMessage.setURL(result.resultInfo[0].url);
-
+                let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed};
+                if ((output as any).entries.length > 0) {
+                    //Move output of youtubedl into return variable (also formatting time)
+                    let out = (output as any).entries[0];
+                    result.resultInfo.push({
+                        name: out.title,
+                        url: out.webpage_url,
+                        length: out.duration,
+                        displayLength: this.formatVideoTime(out.duration),
+                        thumbnail: output.thumbnail,
+                    });
+                    //Create output message to return
+                    result.resultMessage.setTitle("Song Added to Queue");
+                    result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                    result.resultMessage.addField(result.resultInfo[0].name, result.resultInfo[0].displayLength);
+                    result.resultMessage.setURL(result.resultInfo[0].url);
+                } else {
+                    result.resultMessage.setTitle("No Results Found");    
+                }
                 resolve(result);
             });
         });
@@ -129,55 +131,64 @@ const SearchHelper = {
     // Also handles output text for some reason
     // Should probably change that, just need to figure out how to route playlist info out too
     getUrlInfo(query: string, handleType: URL_TYPE) {
-        return new Promise<SearchResult>((resolve, reject) => {
-            // Call youtubedl search
-            youtubedl.default(query, {
-                dumpSingleJson: true,
-            }).then(output => {
-                let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed()};
-                //Handle output based on handletype
-                if (handleType === URL_TYPE.PLAYLIST) { //If handling as playlist
-                    //Loop entries and add to return variable
-                    let outputPlaylist = (output as any);
-                    let playlistDuration:number = 0;
-                    for (let i = 0; i < outputPlaylist.entries.length; i++) {
-                        let curEntry = outputPlaylist.entries[i];
-                        playlistDuration += curEntry.duration;
+        return new Promise<SearchResult>(async (resolve, reject) => {
+            try {
+                // Call youtubedl search
+                await youtubedl.default(query, {
+                    dumpSingleJson: true,
+                }).then(output => {
+                    let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed()};
+                    //Handle output based on handletype
+                    if (handleType === URL_TYPE.PLAYLIST) { //If handling as playlist
+                        //Loop entries and add to return variable
+                        let outputPlaylist = (output as any);
+                        let playlistDuration:number = 0;
+                        for (let i = 0; i < outputPlaylist.entries.length; i++) {
+                            let curEntry = outputPlaylist.entries[i];
+                            playlistDuration += curEntry.duration;
+                            result.resultInfo.push({
+                                name: curEntry.title,
+                                url: curEntry.webpage_url,
+                                length: curEntry.duration,
+                                displayLength: this.formatVideoTime(curEntry.duration),
+                                thumbnail: curEntry.thumbnail,
+                            });
+                        }
+                        //Create output message
+                        result.resultMessage.setTitle("Playlist Added to Queue");
+                        result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                        result.resultMessage.addField(output.title, String(this.formatVideoTime(playlistDuration)));
+                        result.resultMessage.setURL(output.webpage_url);
+                        
+                    } else if (handleType === URL_TYPE.VIDEO) { //If handling as video
+                        //Move output of youtubedl into return variable (also formatting time)
                         result.resultInfo.push({
-                            name: curEntry.title,
-                            url: curEntry.webpage_url,
-                            length: curEntry.duration,
-                            displayLength: this.formatVideoTime(curEntry.duration),
-                            thumbnail: curEntry.thumbnail,
+                            name: output.title,
+                            url: output.webpage_url,
+                            length: output.duration,
+                            displayLength: this.formatVideoTime(output.duration),
+                            thumbnail: output.thumbnail,
                         });
+                        //Create output message to return
+                        result.resultMessage.setTitle("Song Added to Queue");
+                        result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                        result.resultMessage.addField(result.resultInfo[0].name, result.resultInfo[0].displayLength);
+                        result.resultMessage.setURL(result.resultInfo[0].url);
+                    } else {
+                        result.resultMessage.setTitle("An Error was Encountered");
                     }
-                    //Create output message
-                    result.resultMessage.setTitle("Playlist Added to Queue");
-                    result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
-                    result.resultMessage.addField(output.title, String(this.formatVideoTime(playlistDuration)));
-                    result.resultMessage.setURL(output.webpage_url);
-                    
-                } else if (handleType === URL_TYPE.VIDEO) { //If handling as video
-                    //Move output of youtubedl into return variable (also formatting time)
-                    result.resultInfo.push({
-                        name: output.title,
-                        url: output.webpage_url,
-                        length: output.duration,
-                        displayLength: this.formatVideoTime(output.duration),
-                        thumbnail: output.thumbnail,
-                    });
-                    //Create output message to return
-                    result.resultMessage.setTitle("Song Added to Queue");
-                    result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
-                    result.resultMessage.addField(result.resultInfo[0].name, result.resultInfo[0].displayLength);
-                    result.resultMessage.setURL(result.resultInfo[0].url);
+                    resolve(result);
+                });
+            } catch (e) {
+                console.log(e);
+                let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed()};
+                if (new RegExp("Sign in to confirm your age").test((e as any).stderr)) {
+                    result.resultMessage.setTitle("Video is Age-Restricted, Unable to Play");
                 } else {
-
+                    result.resultMessage.setTitle("An Error was Encountered");
                 }
-
-                //Return
                 resolve(result);
-            });
+            }
         });
     },
 
