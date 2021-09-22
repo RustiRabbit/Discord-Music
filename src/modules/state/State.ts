@@ -138,11 +138,15 @@ class State {
     }
 
     async disconnectAudio() {
-        return new Promise<void>(async (resolve, reject) => {
+        return new Promise<boolean>(async (resolve, reject) => {
             let connection = getVoiceConnection(this.guildId_);
-            connection?.disconnect();
+            if(connection != null) {
+                connection.disconnect();
+                resolve(true);
+            } else {
+                resolve(false)
+            }
 
-            resolve();
         })
     }
 

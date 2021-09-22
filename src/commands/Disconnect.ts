@@ -1,6 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import { applicationState } from "..";
 import Command from "../modules/commands/Command";
+import Messages from "../modules/Messages";
 
 class Disconnect extends Command {
     constructor() {
@@ -15,9 +16,14 @@ class Disconnect extends Command {
         
         await interaction.deferReply();
 
-        await state.disconnectAudio();
+        let disconnect = await state.disconnectAudio(); // If true - disconnected, if false - not in a vc
 
-        interaction.editReply(":wave:");
+        if(disconnect == true) {
+            interaction.editReply(Messages.VC.Leave());
+        } else {
+            interaction.editReply(Messages.Error.NotInVC());
+        }
+
     }
 }
 
