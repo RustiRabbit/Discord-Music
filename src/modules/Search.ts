@@ -50,7 +50,7 @@ const SearchHelper = {
         if (isUrl === true) {
             queryUrl = this.parseUrl(query);
         } else {
-            queryUrl = await this.searchVideo(query);
+            return await this.searchVideo(query);
         }
 
         let result:SearchResult;
@@ -69,7 +69,7 @@ const SearchHelper = {
 
     // Verify whether input is a youtube URL
     verifyUrl(query: string) {
-        let verify:RegExp = new RegExp("(^https://www.youtube.com/()|^www.youtube.com/|^youtube.com/)(watch\?|playlist\?)");
+        let verify:RegExp = new RegExp("((^https:\/\/www.youtube.com\/|^www.youtube.com\/|^youtube.com\/)(watch\?|playlist\?))");
         return verify.test(query);
     },
 
@@ -97,19 +97,30 @@ const SearchHelper = {
     // Gets a Url from a search query, sends to link parser and returns info
     searchVideo(query: string) {
         // Returns a promise due to search call, just use an await in implmentation
-        return new Promise<UrlInfo>((resolve, reject) => {
+        return new Promise<SearchResult>((resolve, reject) => {
             // Call youtubedl with ytsearch param
             youtubedl.default(query, {
                 dumpSingleJson: true,
                 defaultSearch: "ytsearch:"
             }).then(output => {
-                // Set default output to error and only change if valid result
-                let outInfo:UrlInfo = {url: "", type: URL_TYPE.ERROR};
-                if ((output as any).entries[0] != undefined) {
-                    // TODO Test if search can result in playlist, if can figure out how to deal with that
-                    outInfo = {url: (output as any).entries[0].webpage_url, type: URL_TYPE.VIDEO};
-                }
-                resolve(outInfo);
+
+                //Move output of youtubedl into return variable (also formatting time)
+                let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed}
+                let out = (output as any).entries[0];
+                result.resultInfo.push({
+                    name: out.title,
+                    url: out.webpage_url,
+                    length: out.duration,
+                    displayLength: this.formatVideoTime(out.duration),
+                    thumbnail: output.thumbnail,
+                });
+                //Create output message to return
+                result.resultMessage.setTitle("Song Added to Queue");
+                result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                result.resultMessage.addField(result.resultInfo[0].name, result.resultInfo[0].displayLength);
+                result.resultMessage.setURL(result.resultInfo[0].url);
+
+                resolve(result);
             });
         });
     },
