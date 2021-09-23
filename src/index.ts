@@ -1,6 +1,6 @@
 // Import Libraries
 import CONFIG from "./config";
-import { Client, Intents, Interaction } from "discord.js";
+import { Client, Guild, Intents, Interaction } from "discord.js";
 import { generateDependencyReport } from "@discordjs/voice";
 
 // Import command handler
@@ -56,11 +56,19 @@ client.once('ready', async () => { // Run when the client logs in sucessfully
     handler.registerSlashCommands(client);
 });
 
+// Create Interaction
 client.on('interactionCreate', (interaction: Interaction) => {
     if(!interaction.isCommand()) return;
 
     handler.handle(interaction);
-})
+});
+
+// On Server Join
+client.on("guildCreate", (guild: Guild) => {
+    // Re-Register Slash Commands
+    console.log("[Status] Reregistering Slash Commands");
+    handler.registerSlashCommands(client);
+});
 
 // Login with our client token
 client.login(CONFIG.TOKEN);

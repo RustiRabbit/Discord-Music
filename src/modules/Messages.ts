@@ -66,7 +66,7 @@ const Messages = {
             let helpEmbed:MessageEmbed = new MessageEmbed();
             
             helpEmbed.setTitle("Help");
-            helpEmbed.addField("Hi! :wave:", "I'm a music bot for personal to replace Rythm and Groovy!");
+            helpEmbed.addField("Hi! :wave:", "I'm a music bot for personal use to replace Rythm and Groovy!");
             helpEmbed.addField("Commands",
             "`Play (Name/Url)` - Adds a song to the queue and joins the voice channel of the user\n" +
             "`Pause` - Pauses the player\n" +
