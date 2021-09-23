@@ -16,6 +16,7 @@ import Pause from "./commands/QueueManipulation/Pause";
 import NowPlaying from "./commands/NowPlaying";
 import Disconnect from "./commands/Disconnect";
 import Clear from "./commands/QueueManipulation/Clear";
+import Remove from "./commands/QueueManipulation/Remove";
 
 // Create Discord Client
 const client = new Client({ intents: [
@@ -37,6 +38,7 @@ handler.registerCommands(new Pause());
 handler.registerCommands(new NowPlaying());
 handler.registerCommands(new Disconnect());
 handler.registerCommands(new Clear());
+handler.registerCommands(new Remove());
 
 // Create State Handler
 const applicationState = new StateManager();

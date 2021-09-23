@@ -83,6 +83,16 @@ class PlayingQueue {
         this.duration.start();
     }
 
+    remove(index: number) {
+        if (index < this.list_.length && index > -1) {
+            let atIndex = this.list_[index];
+            this.list_.splice(index, 1);
+            return atIndex;
+        } else {
+            return false;
+        }
+    }
+
     // Gets the next song
     getSong() {
         // No songs in queue - return null, handled by nextSong in the state class

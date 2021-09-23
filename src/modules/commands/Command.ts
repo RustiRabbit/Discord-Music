@@ -42,7 +42,8 @@ class Command {
             let SlashCommand = new SlashCommandBuilder().setName(this.commandString).setDescription(this.description);
             this.stringOption.forEach(option => {
                 SlashCommand.addStringOption(option);
-            })
+            });
+            
             return SlashCommand;
         }
         return null;

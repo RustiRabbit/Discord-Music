@@ -90,6 +90,9 @@ class State {
         this.queue_.clear();
     }
 
+    remove(index: number) {
+        return this.queue_.remove(index);
+    }
 
     get queue() {
         return this.queue_;
