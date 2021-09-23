@@ -61,4 +61,18 @@ client.on('interactionCreate', (interaction: Interaction) => {
 // Login with our client token
 client.login(CONFIG.TOKEN);
 
+// On Close
+async function closeGracefully(signal: any) {
+    console.log("[Node] Closing Server");
+
+    // TODO - Leave Server VC's
+
+    // Disconnect Client
+    client.destroy();
+    console.log("[Status] Disconnected");
+    
+    process.exit();
+}
+process.on("SIGINT", closeGracefully);
+
 export { applicationState };
