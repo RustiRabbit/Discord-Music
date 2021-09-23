@@ -12,9 +12,11 @@ import Play from "./commands/QueueManipulation/Play";
 import Queue from "./commands/QueueManipulation/Queue";
 import Skip from "./commands/QueueManipulation/Skip";
 import Pause from "./commands/Pause";
-import Clear from "./commands/QueueManipulation/Clear";
 import NowPlaying from "./commands/NowPlaying";
 import Disconnect from "./commands/Disconnect";
+import Clear from "./commands/QueueManipulation/Clear";
+import Remove from "./commands/QueueManipulation/Remove";
+import Help from "./commands/Help";
 import Unpause from "./commands/Unpause";
 
 // Create Discord Client
@@ -37,6 +39,8 @@ handler.registerCommands(new Unpause());
 handler.registerCommands(new NowPlaying());
 handler.registerCommands(new Disconnect());
 handler.registerCommands(new Clear());
+handler.registerCommands(new Remove());
+handler.registerCommands(new Help());
 
 // Create State Handler
 const applicationState = new StateManager();
