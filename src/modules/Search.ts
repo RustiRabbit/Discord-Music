@@ -136,29 +136,30 @@ const SearchHelper = {
                 // Call youtubedl search
                 await youtubedl.default(query, {
                     dumpSingleJson: true,
+                    flatPlaylist: true
                 }).then(output => {
                     let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed()};
                     //Handle output based on handletype
                     if (handleType === URL_TYPE.PLAYLIST) { //If handling as playlist
-                        //Loop entries and add to return variable
                         let outputPlaylist = (output as any);
                         let playlistDuration:number = 0;
-                        for (let i = 0; i < outputPlaylist.entries.length; i++) {
+                        for(let i = 0; i < outputPlaylist.entries.length; i++) {
                             let curEntry = outputPlaylist.entries[i];
                             playlistDuration += curEntry.duration;
+
                             result.resultInfo.push({
                                 name: curEntry.title,
-                                url: curEntry.webpage_url,
+                                url: "https://youtube.com/watch?v=" + curEntry.url,
                                 length: curEntry.duration,
                                 displayLength: this.formatVideoTime(curEntry.duration),
-                                thumbnail: curEntry.thumbnail,
+                                thumbnail: "https://www.theyearinpictures.co.uk/images//image-placeholder.png",
                             });
                         }
+                        
                         //Create output message
                         result.resultMessage.setTitle("Playlist Added to Queue");
-                        result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
                         result.resultMessage.addField(output.title, String(this.formatVideoTime(playlistDuration)));
-                        result.resultMessage.setURL(output.webpage_url);
+                        result.resultMessage.setURL(query);
                         
                     } else if (handleType === URL_TYPE.VIDEO) { //If handling as video
                         //Move output of youtubedl into return variable (also formatting time)
