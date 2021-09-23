@@ -1,3 +1,4 @@
+import { MessageEmbed } from "discord.js";
 /*
 Messages object
 Holds all responses to commands
@@ -50,6 +51,27 @@ const Messages = {
         Leave: () => {
             return ":wave:";
         },
+    },
+    Help: {
+        Main: () => {
+            let helpEmbed:MessageEmbed = new MessageEmbed();
+            
+            helpEmbed.setTitle("Help");
+            helpEmbed.addField("Hi! :wave:", "I'm a music bot for personal to replace Rythm and Groovy!");
+            helpEmbed.addField("Commands",
+            "`Play (Name/Url)` - Adds a song to the queue and joins the voice channel of the user\n" +
+            "`Pause` - Pauses the player\n" +
+            "`Unpause` - Unpauses the player\n" +
+            "`Queue` - Displays the currently queued songs\n" +
+            "`Remove (Index)` - Removes a song in the queue at the provided spot\n" +
+            "`Skip` - Skips the currently playing song\n" +
+            "`Np` - Displays the position within the currently playing song\n" +
+            "`Clear` - Clears the queue and currently playing song\n" +
+            "`Disconnect` - Disconnects the player"
+            );
+
+            return helpEmbed;
+        }
     }
 
 }

@@ -4,7 +4,6 @@ import { applicationState } from "../..";
 import Command from "../../modules/commands/Command";
 import Messages from "../../modules/Messages";
 import { VideoInformation } from "../../modules/Search";
-import PLAYING_STATUS from "../../modules/types/PlayingStatus";
 
 class Remove extends Command {
     constructor() {
