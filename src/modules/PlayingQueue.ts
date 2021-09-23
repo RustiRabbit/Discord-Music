@@ -40,6 +40,8 @@ class PlayingQueue {
 
         let message = "";
 
+        let large = false; // If this equals true, it means that the queue is large enough to need multiple pages
+
         // Check Curently Playing
         if(this.currentlyPlaying_ != null) {
             message += underscore("Now Playing:") + "\n [" + this.currentlyPlaying_.name + "]" + "(" + this.currentlyPlaying_.url + ") | " + "`" + this.currentlyPlaying_.displayLength + "`\n";
@@ -52,7 +54,17 @@ class PlayingQueue {
 
         // Add the actual queue
         for(var i = 0; i < this.list_.length; i++) {
-            message += "`" + (i+1) + ".` " + "[" + this.list_[i].name + "](" + this.list_[i].url + ") | `" + this.list_[i].displayLength + "`" + "\n";
+            let content = "`" + (i+1) + ".` " + "[" + this.list_[i].name + "](" + this.list_[i].url + ") | `" + this.list_[i].displayLength + "`" + "\n";
+            if(message.length + content.length < 1900) {
+                message += content
+            } else {
+                large = true;
+            }
+        }
+
+        // Add the large message
+        if(large == true) {
+            message += "The queue is too large to fully display";
         }
 
         // If the queue is empty, then show a message
