@@ -54,6 +54,8 @@ client.once('ready', async () => { // Run when the client logs in sucessfully
 
     // Register Commands
     handler.registerSlashCommands(client);
+
+    client.user?.setActivity("music");
 });
 
 // Create Interaction
