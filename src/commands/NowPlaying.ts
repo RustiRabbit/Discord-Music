@@ -41,7 +41,10 @@ class NowPlaying extends Command {
                 );
                     
                 // Add thumbnail
-                embed.setThumbnail(thumbnail);
+                if(thumbnail != null) {
+                    embed.setThumbnail(thumbnail);
+
+                }
                 
 
                 interaction.reply({embeds: [embed]});
