@@ -20,7 +20,7 @@ type VideoInformation = {
     url: string,
     length: number,
     displayLength: string,
-    thumbnail: string,
+    thumbnail: string | null,
 }
 
 // Output type
@@ -116,7 +116,9 @@ const SearchHelper = {
                     });
                     //Create output message to return
                     result.resultMessage.setTitle("Song Added to Queue");
-                    result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                    if(result.resultInfo[0].thumbnail != null) {
+                        result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                    }
                     result.resultMessage.addField(result.resultInfo[0].name, result.resultInfo[0].displayLength);
                     result.resultMessage.setURL(result.resultInfo[0].url);
                 } else {
@@ -152,7 +154,7 @@ const SearchHelper = {
                                 url: "https://youtube.com/watch?v=" + curEntry.url,
                                 length: curEntry.duration,
                                 displayLength: this.formatVideoTime(curEntry.duration),
-                                thumbnail: "https://www.theyearinpictures.co.uk/images//image-placeholder.png",
+                                thumbnail: null,
                             });
                         }
                         
@@ -172,7 +174,9 @@ const SearchHelper = {
                         });
                         //Create output message to return
                         result.resultMessage.setTitle("Song Added to Queue");
-                        result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                        if(result.resultInfo[0].thumbnail != null) { // Could be null if it's a playlist
+                            result.resultMessage.setThumbnail(result.resultInfo[0].thumbnail);
+                        }
                         result.resultMessage.addField(result.resultInfo[0].name, result.resultInfo[0].displayLength);
                         result.resultMessage.setURL(result.resultInfo[0].url);
                     } else {
