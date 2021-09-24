@@ -32,7 +32,7 @@ class StateManager {
     }
 
     // Add server to array
-    private addServer(server: DiscordServer) {
+    addServer(server: DiscordServer) {
         this.servers.push(server);
     }
 

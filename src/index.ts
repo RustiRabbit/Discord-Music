@@ -18,6 +18,7 @@ import Clear from "./commands/QueueManipulation/Clear";
 import Remove from "./commands/QueueManipulation/Remove";
 import Help from "./commands/Help";
 import Unpause from "./commands/Unpause";
+import DiscordServer from "./modules/state/DiscordServer";
 
 // Create Discord Client
 const client = new Client({ intents: [
@@ -68,8 +69,9 @@ client.on('interactionCreate', (interaction: Interaction) => {
 // On Server Join
 client.on("guildCreate", (guild: Guild) => {
     // Re-Register Slash Commands
-    console.log("[Status] Reregistering Slash Commands");
-    handler.registerSlashCommands(client);
+    console.log("[Status] Joined new server");
+    handler.registerSlashCommands(client); // Re Register Slash Commands
+    applicationState.addServer(new DiscordServer(guild.id, guild.name)); // Create server state
 });
 
 // Login with our client token
