@@ -48,8 +48,15 @@ class State {
         });
 
         this.player_.on('error', (error) => {
+            // Log Error
             console.log("[Player] THe player reported an error");
             console.log(error);
+
+            // Show the user the error
+            this.sendMessage(bold("Error: ") + "The player experienced an error. Skipping to the next song");
+
+            // Skip to the next song
+            this.nextSong();
         });
     }
 
