@@ -7,6 +7,9 @@ import ytdl from 'ytdl-core';
 import { bold } from "@discordjs/builders";
 import PLAYING_STATUS from "../types/PlayingStatus";
 
+import {  get } from "https";
+import { IncomingMessage } from "http";
+
 /*
 State class
 Contains state of bot per server
@@ -206,12 +209,33 @@ class State {
             return PLAYING_STATUS.Error;
         } else {
             // Download song
-            const input = ytdl(song.url, {filter: 'audioonly'}); // Download
+            const input = await ytdl.getInfo(song.url); // Download
+            
+            let url: null | string = null;
 
-            this.sendMessage(bold("Now Playing: ") +  song.name);
+            // Loop through the infomation and get a url
+            for(var i = 0; i < input.formats.length; i++) {
+                let format = input.formats[i];
+                if(format.mimeType == 'audio/webm; codecs="opus"') {
+                    url = format.url;
+                }
+            }
 
-            const resource = createAudioResource(input); // Create resource
-            this.player_.play(resource); // Play resource
+            if(url == null) {
+                this.sendMessage(bold("Error: ") + "Unable to find a url to play");
+            } else {
+                const request = get(url, (responce: IncomingMessage) => {
+                    const resource = createAudioResource(responce); // Create resource
+                    this.player_.play(resource); // Play resource
+                    this.sendMessage(bold("Now Playing: ") + song?.name);
+
+                    responce.on("error", (error: any) => {
+                        console.log("[Downloader] Expereienced Error");
+                    });
+                });
+            }            
+
+
 
             return PLAYING_STATUS.Playing;
         }
