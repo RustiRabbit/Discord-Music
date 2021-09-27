@@ -206,7 +206,7 @@ class State {
             return PLAYING_STATUS.Error;
         } else {
             // Download song
-            const input = ytdl(song.url, {filter: 'audioonly'}); // Download
+            const input = ytdl(song.url, {filter: 'audioonly', highWaterMark: 1 << 25}); // Download
 
             this.sendMessage(bold("Now Playing: ") +  song.name);
 
