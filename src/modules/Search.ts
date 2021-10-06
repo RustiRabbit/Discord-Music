@@ -69,6 +69,9 @@ const SearchHelper = {
 
     // Verify whether input is a youtube URL
     verifyUrl(query: string) {
+        // Check if its shortend
+        if(query.indexOf("https://youtu.be") == 0 || query.indexOf("youtu.be")) return true;
+
         let verify:RegExp = new RegExp("((^https:\/\/www.youtube.com\/|^www.youtube.com\/|^youtube.com\/)(watch\?|playlist\?))");
         return verify.test(query);
     },
@@ -88,6 +91,8 @@ const SearchHelper = {
         if (new RegExp("list=").test(query) === true) {
             outInfo = {url: query, type: URL_TYPE.PLAYLIST};
         } else if (new RegExp("v=").test(query) === true) {
+            outInfo = {url: query, type: URL_TYPE.VIDEO};
+        } else if (new RegExp("youtu.be").test(query) === true) { 
             outInfo = {url: query, type: URL_TYPE.VIDEO};
         }
         return outInfo;
@@ -125,6 +130,7 @@ const SearchHelper = {
                     result.resultMessage.setTitle("No Results Found");    
                 }
                 resolve(result);
+                
             });
         });
     },
