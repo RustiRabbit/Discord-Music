@@ -1,6 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import * as youtubedl from "youtube-dl-exec";
 
+
 // Enum for user command input (i.e. search or URL)
 enum URL_TYPE {
     VIDEO = 0,
@@ -58,7 +59,7 @@ const SearchHelper = {
         //If an error has been encountered
         //TODO add more descriptive error handling
         if (queryUrl.type === URL_TYPE.ERROR) {
-            result = {resultInfo: [], resultMessage: new MessageEmbed().setTitle("An error was encountered")};
+            result = {resultInfo: [], resultMessage: new MessageEmbed().setTitle("An error was encountered").setDescription("URL didn't meet the creiteria for a Playlist or Video")};
             return result;
         }
 
@@ -69,11 +70,15 @@ const SearchHelper = {
 
     // Verify whether input is a youtube URL
     verifyUrl(query: string) {
-        // Check if its shortend
-        if(query.indexOf("https://youtu.be") == 0 || query.indexOf("youtu.be")) return true;
-
-        let verify:RegExp = new RegExp("((^https:\/\/www.youtube.com\/|^www.youtube.com\/|^youtube.com\/)(watch\?|playlist\?))");
-        return verify.test(query);
+        // Shortened
+        if(new RegExp("(https:\/\/|^|^)(youtu.be\/)").test(query) == true) {
+            return true;
+        // Normal
+        } else if(new RegExp("((^https:\/\/www.youtube.com\/|^www.youtube.com\/|^youtube.com\/)(watch\?|playlist\?))").test(query)) {
+            return true;
+        } else {
+            return false;
+        }
     },
 
     // Url parser
@@ -88,23 +93,41 @@ const SearchHelper = {
 
         //TODO This seems very fallible, think of a better way
         //? Should we add timecode support? Shouldn't be too hard, timecode contained in URL (&t=[timecode in seconds])
-        if (new RegExp("list=").test(query) === true) {
+        
+        
+        if (new RegExp("(?=.*v=)(?=.*list=)").test(query)) {
             outInfo = {url: query, type: URL_TYPE.PLAYLIST};
-        } else if (new RegExp("v=").test(query) === true) {
+        } else if(new RegExp("(playlist\\?list)").test(query)) {
+            outInfo = {url: query, type: URL_TYPE.PLAYLIST};
+        } else if(new RegExp("(watch\\?v)").test(query)) {
             outInfo = {url: query, type: URL_TYPE.VIDEO};
-        } else if (new RegExp("youtu.be").test(query) === true) { 
+        } else if(new RegExp("(https:\/\/|^|^)(youtu.be\/)").test(query)) {
+            outInfo = {url: query, type: URL_TYPE.VIDEO};
+        } else {
+            outInfo = {url: query, type: URL_TYPE.ERROR};
+        }
+
+        return outInfo;
+        /*if (new RegExp("v=").test(query) === true) {
+            outInfo = {url: query, type: URL_TYPE.VIDEO};
+        } else if(new RegExp("(v=)(index=)").test(query) === true) {
+
+        } else if (new RegExp("list=").test(query) === true) {
+            outInfo = {url: query, type: URL_TYPE.PLAYLIST};
+        } else if (new RegExp("(https:\/\/|^|^)(youtu.be\/)").test(query) === true) {
             outInfo = {url: query, type: URL_TYPE.VIDEO};
         }
-        return outInfo;
+        return outInfo;*/
     },
 
     // Search term searcher
     // Gets a Url from a search query, sends to link parser and returns info
     searchVideo(query: string) {
         // Returns a promise due to search call, just use an await in implmentation
-        return new Promise<SearchResult>((resolve, reject) => {
+        return new Promise<SearchResult>(async (resolve, reject) => {
+            console.log(query);
             // Call youtubedl with ytsearch param
-            youtubedl.default(query, {
+            await youtubedl.default(query, {
                 dumpSingleJson: true,
                 defaultSearch: "ytsearch:"
             }).then(output => {
@@ -130,8 +153,15 @@ const SearchHelper = {
                     result.resultMessage.setTitle("No Results Found");    
                 }
                 resolve(result);
-                
+            }).catch((error) => {
+                console.log(error);
+                let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed()};
+                result.resultMessage.setTitle("An Error was Encountered");
+                result.resultMessage.setDescription("Video search failed. Double check the link is in the normal format and try again");
+                resolve(result);
             });
+            
+            
         });
     },
 
@@ -141,6 +171,7 @@ const SearchHelper = {
     getUrlInfo(query: string, handleType: URL_TYPE) {
         return new Promise<SearchResult>(async (resolve, reject) => {
             try {
+                console.log(query);
                 // Call youtubedl search
                 await youtubedl.default(query, {
                     dumpSingleJson: true,
