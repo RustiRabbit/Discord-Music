@@ -20,9 +20,12 @@ RUN npm install
 # Compile TypeScript
 RUN npm run build
 
+# Install PM2
+RUN npm install pm2 -g
+
 # Environment Variables
 ENV NODE_ENV production
 ARG TOKEN
 
 # Start
-CMD ["node", "build/index.js"]
+CMD ["pm2-runtime", "build/index.js"]
