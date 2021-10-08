@@ -125,7 +125,6 @@ const SearchHelper = {
     searchVideo(query: string) {
         // Returns a promise due to search call, just use an await in implmentation
         return new Promise<SearchResult>(async (resolve, reject) => {
-            console.log(query);
             // Call youtubedl with ytsearch param
             await youtubedl.default(query, {
                 dumpSingleJson: true,
@@ -157,7 +156,7 @@ const SearchHelper = {
                 console.log(error);
                 let result:SearchResult = {resultInfo: [], resultMessage: new MessageEmbed()};
                 result.resultMessage.setTitle("An Error was Encountered");
-                result.resultMessage.setDescription("Video search failed. Double check the link is in the normal format and try again");
+                result.resultMessage.setDescription("Query was parsed as a link, but the search failed");
                 resolve(result);
             });
             
@@ -171,7 +170,6 @@ const SearchHelper = {
     getUrlInfo(query: string, handleType: URL_TYPE) {
         return new Promise<SearchResult>(async (resolve, reject) => {
             try {
-                console.log(query);
                 // Call youtubedl search
                 await youtubedl.default(query, {
                     dumpSingleJson: true,
@@ -182,23 +180,28 @@ const SearchHelper = {
                     if (handleType === URL_TYPE.PLAYLIST) { //If handling as playlist
                         let outputPlaylist = (output as any);
                         let playlistDuration:number = 0;
-                        for(let i = 0; i < outputPlaylist.entries.length; i++) {
-                            let curEntry = outputPlaylist.entries[i];
-                            playlistDuration += curEntry.duration;
-
-                            result.resultInfo.push({
-                                name: curEntry.title,
-                                url: "https://youtube.com/watch?v=" + curEntry.url,
-                                length: curEntry.duration,
-                                displayLength: this.formatVideoTime(curEntry.duration),
-                                thumbnail: null,
-                            });
+                        if(outputPlaylist.entries == null) {
+                            result.resultMessage.setTitle("An Error was Encountered").setDescription("The link was parsed as a playlist, but is a video. Please double check the link");
+                        } else {
+                            for(let i = 0; i < outputPlaylist.entries.length; i++) {
+                                let curEntry = outputPlaylist.entries[i];
+                                playlistDuration += curEntry.duration;
+    
+                                result.resultInfo.push({
+                                    name: curEntry.title,
+                                    url: "https://youtube.com/watch?v=" + curEntry.url,
+                                    length: curEntry.duration,
+                                    displayLength: this.formatVideoTime(curEntry.duration),
+                                    thumbnail: null,
+                                });
+                            }
+                            
+                            //Create output message
+                            result.resultMessage.setTitle("Playlist Added to Queue");
+                            result.resultMessage.addField(output.title, String(this.formatVideoTime(playlistDuration)));
+                            result.resultMessage.setURL(query);
                         }
-                        
-                        //Create output message
-                        result.resultMessage.setTitle("Playlist Added to Queue");
-                        result.resultMessage.addField(output.title, String(this.formatVideoTime(playlistDuration)));
-                        result.resultMessage.setURL(query);
+                       
                         
                     } else if (handleType === URL_TYPE.VIDEO) { //If handling as video
                         //Move output of youtubedl into return variable (also formatting time)
