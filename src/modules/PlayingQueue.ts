@@ -142,7 +142,13 @@ class PlayingQueue {
         } else { // Songs to work with
             if (this.loop_ == false || this.currentlyPlaying_ == null) {
                 this.currentlyPlaying_ = this.list_[0]; // Sets currently playing song
-                this.list_.shift(); // Removes the song from the queue (so it doesn't get played again)
+                if (this.loopQueue_ == false) {
+                    this.list_.shift(); // Removes the song from the queue (so it doesn't get played again)
+                } else {
+                    this.list_.push(this.list_[0]);
+                    this.list_.shift();
+                }
+                
             }
 
             // Change Playing State
