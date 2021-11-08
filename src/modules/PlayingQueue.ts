@@ -13,6 +13,8 @@ class PlayingQueue {
     private currentlyPlaying_: VideoInformation | null; // Currently Playing Video
     private duration: Duration;
     private list_:Array<VideoInformation>; // Queue list
+    public loop_:boolean = false;
+    private loopQueue_:boolean = false;
 
     constructor() {
         this.state_ = QUEUE_STATE.STOP;
@@ -79,7 +81,9 @@ class PlayingQueue {
 
     // Done when a song has finished played
     finished()  {
-        this.currentlyPlaying_ = null;
+        if (this.loop_ === false) {
+            this.currentlyPlaying_ = null;
+        }
         this.state_ = QUEUE_STATE.STOP;
         this.duration.reset();
     }
@@ -105,16 +109,41 @@ class PlayingQueue {
         }
     }
 
+    // Toggles individual song loop
+    toggleLoop() {
+        if (this.loop_ === false) {
+            this.loop_ = true;
+            return true;
+        } else {
+            this.loop_ = false;
+            return false;
+        }
+    }
+
+    // Toggles queues loop
+    toggleQueueLoop() {
+        if (this.loopQueue_ === false) {
+            this.loopQueue_ = true;
+            return true;
+        } else {
+            this.loopQueue_ = false;
+            return false;
+        }
+    }
+
     // Gets the next song
     getSong() {
         // No songs in queue - return null, handled by nextSong in the state class
-        if(this.list_.length == 0) {
+        // 8/11/21 added the loop check so the vile gremlin doesnt keep voiding my damn loop
+        if(this.list_.length == 0 && this.loop_ == false) {
             this.currentlyPlaying_ = null;
             this.state_ = QUEUE_STATE.STOP;
             return null;
         } else { // Songs to work with
-            this.currentlyPlaying_ = this.list_[0]; // Sets currently playing song
-            this.list_.shift(); // Removes the song from the queue (so it doesn't get played again)
+            if (this.loop_ == false || this.currentlyPlaying_ == null) {
+                this.currentlyPlaying_ = this.list_[0]; // Sets currently playing song
+                this.list_.shift(); // Removes the song from the queue (so it doesn't get played again)
+            }
 
             // Change Playing State
             this.state_ = QUEUE_STATE.PLAY;

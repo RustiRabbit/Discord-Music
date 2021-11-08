@@ -208,7 +208,9 @@ class State {
             // Download song
             const input = ytdl(song.url, {filter: 'audioonly', highWaterMark: 1 << 25}); // Download
 
-            this.sendMessage(bold("Now Playing: ") +  song.name);
+            if (this.queue.loop_ == false) {
+                this.sendMessage(bold("Now Playing: ") +  song.name);
+            }
 
             const resource = createAudioResource(input); // Create resource
             this.player_.play(resource); // Play resource
