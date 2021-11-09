@@ -19,9 +19,9 @@ class LoopQueue extends Command {
         // Little goblin function that toggles the loop and returns the value for the message
         let loopState:boolean = state.queue.toggleQueueLoop();
         if (loopState == true) {
-            interaction.editReply(":repeat_one: :white_check_mark: Queue Loop Turned On");
+            interaction.editReply(":repeat: :white_check_mark: Queue Loop Turned On");
         } else {
-            interaction.editReply(":repeat_one: :x: Queue Loop Turned Off");
+            interaction.editReply(":repeat: :x: Queue Loop Turned Off");
         }
     }
 }
