@@ -1,11 +1,21 @@
 import { AudioPlayer, AudioPlayerStatus, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
-import { CommandInteraction, StageChannel, TextBasedChannels, VoiceChannel, MessageEmbed } from "discord.js";
+import {
+    CommandInteraction,
+    StageChannel,
+    TextBasedChannels,
+    VoiceChannel,
+    MessageEmbed,
+    GuildMember,
+    GuildChannelResolvable, GuildChannel
+} from "discord.js";
 import Messages from "../Messages";
 import PlayingQueue, { QUEUE_STATE } from "../PlayingQueue";
 import SearchHelper from "../Search";
 import ytdl from 'ytdl-core';
 import { bold } from "@discordjs/builders";
 import PLAYING_STATUS from "../types/PlayingStatus";
+
+const DISCONNECT_DURATION = 2*60*1000;
 
 /*
 State class
@@ -17,11 +27,15 @@ class State {
     private player_:AudioPlayer;
     private message_:TextBasedChannels | null = null;
     private guildId_:string;
+    private voiceChannel: VoiceChannel | null = null;
+
+    private disconnectTimer: any = null;
 
     constructor(guildId: string) {
         this.queue_ = new PlayingQueue();
         this.player_ = new AudioPlayer();
         this.guildId_ = guildId;
+
 
         this.player_.on(AudioPlayerStatus.Idle, () => {
             console.log("[Player] Idle");
@@ -36,8 +50,29 @@ class State {
         this.player_.on(AudioPlayerStatus.Playing, () => {
             console.log("[Player] Playing");
             
-            // Start the duration
+            // Start the duration/
             this.queue_.unpause();
+
+            // Start the disconnectTimer
+            if(this.disconnectTimer == null) {
+                this.disconnectTimer = setInterval(() => {
+                    let number = 0; // Default number of users
+                    this.voiceChannel?.members.each((member: GuildMember) => {
+                        number++; // Add all the users together
+                    });
+                    if(number == 1) { // Means that only sink is in the vc, we therefore are compelled to forcibly remove the vile creature from the vc
+                        if(this.voiceChannel != null) {
+                            let connection: VoiceConnection | undefined = getVoiceConnection(this.voiceChannel.guildId);
+                            if(connection != undefined) { // means that shit **didn't** happened and I cbf to work this out
+                                this.disconnectAudio(); // disconnect
+                                this.sendMessage("bye ig");
+                                clearInterval(this.disconnectTimer);
+                            }
+                        }
+
+                    }
+                }, DISCONNECT_DURATION);
+            }
         });
 
         this.player_.on(AudioPlayerStatus.Paused, () => {
@@ -60,6 +95,8 @@ class State {
         });
     }
 
+
+    // Send a message in the chat OR in the console if the chat is unable
     sendMessage(text: string) {
         if(this.message_ != null) {
             this.message_.send(text);
@@ -120,6 +157,11 @@ class State {
             // Setup subscriptions
             connection.subscribe(this.player_);
 
+            // Set the channel
+            if(channel instanceof VoiceChannel) {
+                this.voiceChannel = channel;
+            }
+
             // Shown when ready to play
             connection.on(VoiceConnectionStatus.Ready, () => {
                 console.log("[VC Status] Ready");
@@ -133,9 +175,22 @@ class State {
                             entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
                             entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
                         ]);
+                        // Seems to be reconnecting to a new channel - ignore disconnect
                         console.log("[Connection State] Ignoring Disconnect")
                         connection.subscribe(this.player_);
-                        // Seems to be reconnecting to a new channel - ignore disconnect
+
+                        // Change the current channel for the autodisconnect
+                        let newConnection: VoiceConnection | undefined = getVoiceConnection(channel.guildId);
+                        if(newConnection != undefined) {
+                            if(newConnection.joinConfig.channelId != null) {
+                                this.voiceChannel?.guild.channels.fetch(newConnection.joinConfig.channelId).then((channel: any) => {
+                                    this.voiceChannel = (channel as VoiceChannel);
+                                });
+
+                            }
+
+                        }
+
                     } catch (error) {
                         // Seems to be a real disconnect which SHOULDN'T be recovered from
                         console.log("[Connection State] Destroyed")
@@ -144,6 +199,15 @@ class State {
                         // Pause the currently playing timer
                         this.queue_.pause();
                         this.queue_.finished();
+
+                        // Stop the timer
+                        if(this.disconnectTimer != null) {
+                            clearInterval(this.disconnectTimer);
+                        }
+                        this.disconnectTimer = null;
+
+                        // Clear the channel
+                        //this.voiceChannel = null;
                     }
                 }
             });
@@ -160,6 +224,7 @@ class State {
             let connection = getVoiceConnection(this.guildId_);
             if(connection != null) {
                 connection.disconnect();
+                this.voiceChannel = null;
                 resolve(true);
             } else {
                 resolve(false)
@@ -208,7 +273,9 @@ class State {
             // Download song
             const input = ytdl(song.url, {filter: 'audioonly', highWaterMark: 1 << 25}); // Download
 
-            this.sendMessage(bold("Now Playing: ") +  song.name);
+            if (this.queue.loop_ == false) {
+                this.sendMessage(bold("Now Playing: ") +  song.name);
+            }
 
             const resource = createAudioResource(input); // Create resource
             this.player_.play(resource); // Play resource
