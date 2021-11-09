@@ -75,6 +75,8 @@ class PlayingQueue {
         }
 
         Embed.setDescription(message);
+        Embed.addField("Song Loop", this.loop_ ? "yes" : "no", true);
+        Embed.addField("Queue Loop", this.loopQueue_ ? "yes" : "no", true);
 
         return Embed;
     }
@@ -129,6 +131,11 @@ class PlayingQueue {
             this.loopQueue_ = false;
             return false;
         }
+    }
+
+    // Disable the loop - like me :)
+    disableLoop() {
+        this.loop_ = false;
     }
 
     // Gets the next song
