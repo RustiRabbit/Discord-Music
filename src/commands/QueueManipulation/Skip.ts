@@ -18,6 +18,7 @@ class Skip extends Command {
         let server = await applicationState.getServer(interaction.guildId as string);
         let state = server.state;
 
+        state.queue.disableLoop(); // Disable loop for the kool kids - ha flynn get sucked in I invalidated ur original comment and made u look dumb
         let nextSong = await state.nextSong(); // Gets the next song state
 
         if(nextSong == PLAYING_STATUS.Playing) { // Playing next song
