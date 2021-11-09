@@ -4,6 +4,7 @@ import Command from "../../modules/commands/Command";
 import Messages from "../../modules/Messages";
 import PLAYING_STATUS from "../../modules/types/PlayingStatus";
 
+// NOTE when trying to skip when loop true will just restart the looped song. I am keep this in so those who use the bot understand how it feels to write this unholy accursed scroll
 class Skip extends Command {
     constructor() {
         super();
