@@ -83,8 +83,8 @@ class PlayingQueue {
         }
 
         Embed.setDescription(message);
-        Embed.addField("Song Loop", this.loop_ ? "yes" : "no", true);
-        Embed.addField("Queue Loop", this.loopQueue_ ? "yes" : "no", true);
+        Embed.addField("Song Loop", this.loop_ ? ":white_check_mark: " : ":x:", true);
+        Embed.addField("Queue Loop", this.loopQueue_ ? ":white_check_mark: " : ":x:", true);
 
         return Embed;
     }
