@@ -138,6 +138,10 @@ class State {
         return this.queue_.remove(index);
     }
 
+    shuffleQueue() {
+        this.queue_.shuffleQueue();
+    }
+
     get queue() {
         return this.queue_;
     }

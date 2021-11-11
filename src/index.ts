@@ -21,6 +21,7 @@ import Unpause from "./commands/Unpause";
 import DiscordServer from "./modules/state/DiscordServer";
 import Loop from "./commands/QueueManipulation/Loop";
 import LoopQueue from "./commands/QueueManipulation/LoopQueue";
+import Shuffle from "./commands/QueueManipulation/Shuffle";
 
 // Create Discord Client
 const client = new Client({ intents: [
@@ -46,6 +47,7 @@ handler.registerCommands(new Remove());
 handler.registerCommands(new Help());
 handler.registerCommands(new Loop());
 handler.registerCommands(new LoopQueue());
+handler.registerCommands(new Shuffle());
 
 // Create State Handler
 const applicationState = new StateManager();

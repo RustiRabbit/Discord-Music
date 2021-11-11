@@ -35,6 +35,14 @@ class PlayingQueue {
         this.state_ = QUEUE_STATE.STOP; // Set the state to stop
     }
 
+    // Shuffle Queue
+    shuffleQueue() {
+        this.list_ = this.list_
+            .map((value) => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value)
+    }
+
     // Generates a queue message, returns a message embed
     generateQueueMessage() {
         const Embed = new MessageEmbed();
